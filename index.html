@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CTBOT – Digital CT Learning Platform</title>
+<title>CT BOT</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CTBOT – Digital CT Learning Platform</title>
+<title>CT BOT</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -386,7 +386,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 <!-- ══════════ HOME ══════════ -->
 <div class="screen active" id="home">
   <div class="topbar">
-    <div class="topbar-title">🤖 <span>DCTLP</span></div>
+    <div class="topbar-title">🤖 <span>CT BOT</span></div>
     <div class="topbar-right">
       <div class="lang-toggle">
         <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -398,7 +398,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   <div class="screen-body">
     <div class="home-hero">
       <div class="robot-badge">🤖</div>
-      <h1><em>DCTLP</em> – <span class="t" data-en="Digital CT Learning Platform" data-bm="Platform Pembelajaran CT Digital"></span></h1>
+      <h1><em>CT BOT</em></h1>
       <p class="t" data-en="Choose your level and start learning Computational Thinking!" data-bm="Pilih tahap anda dan mula belajar Pemikiran Komputasional!"></p>
     </div>
     <div class="student-row">
@@ -548,12 +548,12 @@ const G = {
   prog: {}, log: []
 };
 function loadStorage(){
-  try{ G.prog=JSON.parse(localStorage.getItem('dctlp2_prog')||'{}'); }catch(e){}
-  try{ G.log=JSON.parse(localStorage.getItem('dctlp2_log')||'[]'); }catch(e){}
+  try{ G.prog=JSON.parse(localStorage.getItem('ctbot_prog')||'{}'); }catch(e){}
+  try{ G.log=JSON.parse(localStorage.getItem('ctbot_log')||'[]'); }catch(e){}
 }
 function saveStorage(){
-  try{localStorage.setItem('dctlp2_prog',JSON.stringify(G.prog));}catch(e){}
-  try{localStorage.setItem('dctlp2_log',JSON.stringify(G.log));}catch(e){}
+  try{localStorage.setItem('ctbot_prog',JSON.stringify(G.prog));}catch(e){}
+  try{localStorage.setItem('ctbot_log',JSON.stringify(G.log));}catch(e){}
 }
 loadStorage();
 
