@@ -1,0 +1,2182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCTLP – Digital CT Learning Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCTLP – Digital CT Learning Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --basic:#2563EB;  --basic-l:#DBEAFE;  --basic-d:#1E40AF;
+  --loop:#16A34A;   --loop-l:#DCFCE7;   --loop-d:#166534;
+  --input:#EA580C;  --input-l:#FFEDD5;  --input-d:#9A3412;
+  --radio:#7C3AED;  --radio-l:#EDE9FE;  --radio-d:#5B21B6;
+  --music:#0D9488;  --music-l:#CCFBF1;  --music-d:#0F766E;
+  --bg:#F0F4FF; --card:#FFF; --text:#1E293B; --muted:#64748B;
+  --border:#E2E8F0; --correct:#16A34A; --wrong:#DC2626;
+  --warn:#F59E0B; --star:#F59E0B; --radius:16px;
+  --shadow:0 4px 24px rgba(0,0,0,.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* SCREENS */
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+.screen-body{flex:1;overflow-y:auto;padding:16px 16px 32px}
+
+/* TOP BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;
+  background:#fff;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.topbar-title{font-family:'Fredoka One',cursive;font-size:1.15rem;color:var(--text);display:flex;gap:6px;align-items:center}
+.topbar-title span{color:var(--basic)}
+.topbar-right{display:flex;gap:6px;align-items:center}
+.lang-toggle{display:flex;background:var(--bg);border-radius:20px;padding:3px}
+.lang-btn{padding:3px 11px;border-radius:16px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;
+  font-weight:800;font-size:.78rem;background:transparent;color:var(--muted);transition:all .2s}
+.lang-btn.active{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.icon-btn{width:34px;height:34px;border-radius:50%;border:none;background:var(--bg);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s}
+.icon-btn:hover{background:var(--border)}
+
+/* PROGRESS BAR */
+.prog-bar{height:5px;background:var(--border)}
+.prog-fill{height:100%;transition:width .4s ease}
+
+/* HOME */
+#home{background:linear-gradient(155deg,#EFF6FF 0%,#F0FDF4 50%,#FEF3C7 100%)}
+.home-hero{text-align:center;padding:24px 16px 12px}
+.home-hero h1{font-family:'Fredoka One',cursive;font-size:1.9rem;color:var(--text);line-height:1.2}
+.home-hero h1 em{font-style:normal;color:var(--basic)}
+.home-hero p{color:var(--muted);margin-top:6px;font-size:.9rem}
+.robot-badge{width:72px;height:72px;margin:0 auto 14px;background:var(--text);border-radius:18px;
+  display:flex;align-items:center;justify-content:center;font-size:2.2rem;
+  box-shadow:0 6px 20px rgba(30,41,59,.25);animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+.student-row{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;padding:6px 16px 14px}
+.student-row label{font-weight:800;font-size:.85rem}
+.student-row select{padding:7px 12px;border-radius:20px;border:2px solid var(--border);font-family:'Nunito',sans-serif;
+  font-size:.85rem;font-weight:700;background:#fff;cursor:pointer;color:var(--text)}
+.student-row select:focus{outline:none;border-color:var(--basic)}
+
+.level-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:0 16px 24px}
+.level-card{background:#fff;border-radius:var(--radius);padding:18px 14px;cursor:pointer;
+  border:3px solid transparent;box-shadow:var(--shadow);transition:all .25s;text-align:center;
+  position:relative;overflow:hidden}
+.level-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+.level-card.lv-basic::before{background:var(--basic)} .level-card.lv-loop::before{background:var(--loop)}
+.level-card.lv-input::before{background:var(--input)} .level-card.lv-radio::before{background:var(--radio)}
+.level-card.lv-music::before{background:var(--music)}
+.level-card:hover{transform:translateY(-4px);box-shadow:0 10px 32px rgba(0,0,0,.15)}
+.level-card:active{transform:scale(.97)}
+.lv-icon{font-size:2rem;margin-bottom:8px}
+.lv-name{font-family:'Fredoka One',cursive;font-size:1.05rem;margin-bottom:3px}
+.lv-basic .lv-name{color:var(--basic)} .lv-loop .lv-name{color:var(--loop)}
+.lv-input .lv-name{color:var(--input)} .lv-radio .lv-name{color:var(--radio)}
+.lv-music .lv-name{color:var(--music)}
+.lv-ct{font-size:.68rem;color:var(--muted);margin-bottom:8px;line-height:1.3}
+.lv-prog-wrap{height:5px;background:var(--border);border-radius:3px}
+.lv-prog-bar{height:100%;border-radius:3px;transition:width .5s}
+.lv-basic .lv-prog-bar{background:var(--basic)} .lv-loop .lv-prog-bar{background:var(--loop)}
+.lv-input .lv-prog-bar{background:var(--input)} .lv-radio .lv-prog-bar{background:var(--radio)}
+.lv-music .lv-prog-bar{background:var(--music)}
+.lv-prog-text{font-size:.65rem;color:var(--muted);margin-top:3px}
+.new-badge{position:absolute;top:10px;right:10px;font-size:.62rem;font-weight:800;
+  padding:2px 7px;border-radius:10px;background:var(--warn);color:#fff}
+
+/* MODE SCREEN */
+.mode-hero{padding:18px 16px 8px;text-align:center}
+.mode-tag{display:inline-block;padding:4px 14px;border-radius:20px;font-size:.82rem;font-weight:800;margin-bottom:8px}
+.mode-hero h2{font-family:'Fredoka One',cursive;font-size:1.5rem;margin-bottom:4px}
+.mode-hero p{color:var(--muted);font-size:.85rem}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 16px 24px}
+.mode-card{background:#fff;border-radius:var(--radius);padding:22px 14px;cursor:pointer;
+  border:3px solid var(--border);box-shadow:var(--shadow);transition:all .25s;text-align:center}
+.mode-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.12)}
+.mode-card.mc-unplug{border-color:var(--warn)}
+.mode-card.mc-plug{border-color:var(--basic)}
+.mc-icon{font-size:2.4rem;margin-bottom:10px}
+.mc-title{font-family:'Fredoka One',cursive;font-size:1.05rem;margin-bottom:5px}
+.mc-desc{font-size:.75rem;color:var(--muted);line-height:1.4}
+.mc-count{display:inline-block;margin-top:8px;padding:2px 10px;border-radius:10px;
+  font-size:.7rem;font-weight:800;background:var(--bg);color:var(--muted)}
+
+/* ACTIVITY LIST */
+.list-head{padding:14px 16px 4px}
+.list-head h2{font-family:'Fredoka One',cursive;font-size:1.3rem}
+.list-head p{font-size:.82rem;color:var(--muted);margin-top:2px}
+.act-list{display:flex;flex-direction:column;gap:10px;padding:10px 16px 24px}
+.act-row{background:#fff;border-radius:var(--radius);padding:14px 16px;cursor:pointer;
+  border:2px solid var(--border);display:flex;align-items:center;gap:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);transition:all .2s}
+.act-row:hover{border-color:var(--basic);transform:translateX(3px)}
+.act-row.done{background:#F0FDF4;border-color:#86EFAC}
+.act-num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-weight:800;font-size:.85rem;color:#fff;flex-shrink:0}
+.act-info{flex:1}
+.act-name{font-weight:800;font-size:.9rem;margin-bottom:1px}
+.act-meta{font-size:.72rem;color:var(--muted)}
+.act-status{font-size:1.2rem}
+.type-badge{display:inline-block;padding:1px 7px;border-radius:8px;font-size:.65rem;font-weight:800;
+  margin-left:6px;vertical-align:middle}
+
+/* ACTIVITY SCREEN COMMON */
+.act-header{padding:14px 16px 0}
+.act-title{font-family:'Fredoka One',cursive;font-size:1.15rem;margin-bottom:2px}
+.act-sub{font-size:.78rem;color:var(--muted)}
+.task-box{background:#FFFBEB;border:2px solid var(--warn);border-radius:var(--radius);
+  padding:12px 14px;margin:12px 16px;display:flex;gap:10px;align-items:flex-start}
+.task-box .tb-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px}
+.task-box .tb-text{font-size:.87rem;font-weight:700;line-height:1.5}
+
+/* DRAG & DROP */
+.dnd-wrap{padding:0 16px 16px}
+.dnd-section-label{font-size:.72rem;font-weight:800;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.item-bank{display:flex;flex-wrap:wrap;gap:7px;min-height:52px;padding:10px;
+  background:#fff;border:2px dashed var(--border);border-radius:var(--radius);margin-bottom:14px}
+.item-bank.highlight-drop{border-color:var(--basic);background:#EFF6FF}
+.drag-chip{padding:7px 12px;border-radius:10px;font-weight:700;font-size:.82rem;cursor:grab;
+  user-select:none;border:2px solid transparent;transition:all .15s;
+  display:flex;align-items:center;gap:5px;touch-action:none}
+.drag-chip:hover{transform:scale(1.05);box-shadow:0 3px 10px rgba(0,0,0,.15)}
+.drag-chip.dragging{opacity:.3;cursor:grabbing}
+.drag-chip.selected{outline:3px solid var(--basic);outline-offset:2px}
+.drop-row{min-height:46px;border:2px dashed var(--border);border-radius:10px;
+  padding:6px 10px;display:flex;align-items:center;gap:8px;
+  background:var(--bg);transition:all .15s;margin-bottom:7px}
+.drop-row.drag-over{border-color:var(--basic);background:#EFF6FF;transform:scale(1.01)}
+.drop-row.correct-slot{border-color:var(--correct);background:#F0FDF4}
+.drop-row.wrong-slot{border-color:var(--wrong);background:#FEF2F2;animation:shake .35s}
+.slot-num{width:26px;height:26px;border-radius:50%;background:var(--border);
+  display:flex;align-items:center;justify-content:center;font-weight:800;
+  font-size:.75rem;color:var(--muted);flex-shrink:0}
+.slot-hint{font-size:.72rem;color:var(--muted);font-style:italic}
+.slot-feedback{font-size:.8rem;font-weight:700;margin-left:auto}
+
+/* PSEUDOCODE CARD */
+.pc-wrap{padding:0 16px 20px}
+.pc-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:2px solid var(--border)}
+.pc-top{padding:14px;border-bottom:2px solid var(--border)}
+.pc-task{font-weight:800;font-size:.9rem;margin-bottom:8px;line-height:1.4}
+.pc-microbit{display:flex;align-items:center;gap:10px}
+.mb-display{width:78px;height:50px;background:#1a1a2e;border-radius:8px;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:6px;flex-shrink:0}
+.led{border-radius:2px;transition:background .3s}
+.led.on{background:#FF6B35;box-shadow:0 0 5px #FF6B35}
+.led.off{background:#2d2d4e}
+.mb-label{font-size:.7rem;color:var(--muted)}
+.pc-body{display:grid;grid-template-columns:1fr 1fr}
+.pc-bank,.pc-seq{padding:12px}
+.pc-bank{border-right:2px solid var(--border)}
+.pc-section-lbl{font-size:.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:8px}
+.code-blocks{display:flex;flex-direction:column;gap:5px}
+.code-chip{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:8px;
+  cursor:grab;font-family:'Space Mono',monospace;font-size:.68rem;font-weight:700;
+  border:2px solid transparent;transition:all .15s;touch-action:none;line-height:1.3}
+.code-chip:hover{transform:translateX(2px);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.code-chip.dragging{opacity:.25}
+.code-chip.selected{outline:3px solid var(--basic);outline-offset:1px}
+.chip-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.seq-slots{display:flex;flex-direction:column;gap:5px}
+.seq-slot{min-height:38px;border:2px dashed var(--border);border-radius:7px;padding:3px 7px;
+  display:flex;align-items:center;gap:5px;background:var(--bg);transition:all .15s}
+.seq-slot.drag-over{border-color:var(--basic);background:#EFF6FF}
+.seq-slot.correct-slot{border-color:var(--correct);background:#F0FDF4}
+.seq-slot.wrong-slot{border-color:var(--wrong);background:#FEF2F2;animation:shake .35s}
+.seq-slot.prefilled{border-style:solid;border-color:var(--border);background:#fff;cursor:not-allowed}
+.slot-idx{font-size:.65rem;font-weight:800;color:var(--muted);min-width:14px}
+.pc-actions{padding:10px 12px;border-top:2px solid var(--border);display:flex;gap:7px;flex-wrap:wrap}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:12px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;
+  font-weight:800;font-size:.85rem;transition:all .2s;display:inline-flex;align-items:center;gap:5px}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--basic);color:#fff}
+.btn-success{background:var(--correct);color:#fff}
+.btn-warn{background:var(--warn);color:#fff}
+.btn-secondary{background:var(--bg);color:var(--text);border:2px solid var(--border)}
+.btn-secondary:hover{background:var(--border)}
+.btn-sm{padding:5px 12px;font-size:.78rem;border-radius:9px}
+.btn-back{background:none;border:none;cursor:pointer;font-family:'Nunito',sans-serif;
+  font-weight:700;font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:3px;padding:6px 0}
+.btn-back:hover{color:var(--text)}
+.act-btns{padding:0 16px 20px;display:flex;gap:8px;flex-wrap:wrap}
+.hint-btn{background:#FFFBEB;border:2px solid var(--warn);border-radius:8px;padding:5px 11px;
+  font-size:.77rem;font-weight:800;cursor:pointer;color:#92400E;display:inline-flex;align-items:center;gap:4px;
+  font-family:'Nunito',sans-serif;transition:all .2s}
+.hint-btn:hover{background:#FEF9C3}
+
+/* SELECT ACTIVITY */
+.select-grid{display:flex;flex-direction:column;gap:7px;padding:0 16px 14px}
+.sel-chip{padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;font-size:.85rem;
+  border:2px solid var(--border);background:#fff;display:flex;align-items:center;gap:8px;transition:all .2s}
+.sel-chip:hover{border-color:var(--basic)}
+.sel-chip.selected{border-color:var(--basic);background:#EFF6FF;outline:2px solid var(--basic)}
+.sel-chip.correct-sel{border-color:var(--correct);background:#F0FDF4}
+.sel-chip.wrong-sel{border-color:var(--wrong);background:#FEF2F2}
+.sel-chip.missed-sel{border-color:var(--warn);background:#FFFBEB}
+
+/* CATEGORISE */
+.cat-zones{display:flex;flex-direction:column;gap:12px;padding:0 16px 14px}
+.cat-zone-wrap{background:#fff;border-radius:var(--radius);overflow:hidden;border:2px solid var(--border)}
+.cat-zone-hdr{padding:8px 12px;font-weight:800;font-size:.82rem;border-bottom:2px solid var(--border)}
+.cat-zone-body{min-height:52px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;
+  transition:all .2s;background:var(--bg)}
+.cat-zone-body.drag-over{background:#EFF6FF;border-color:var(--basic)}
+.cat-empty{font-size:.72rem;color:var(--muted);font-style:italic;padding:4px}
+
+/* DEBUG ACTIVITY */
+.debug-sequence{display:flex;flex-direction:column;gap:6px;padding:0 16px 14px}
+.debug-item{padding:10px 14px;border-radius:10px;border:2px solid var(--border);background:#fff;
+  display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s}
+.debug-item:hover{border-color:var(--basic)}
+.debug-item.selected-bug{border-color:var(--wrong);background:#FEF2F2;outline:2px solid var(--wrong)}
+.debug-item.correct-bug{border-color:var(--correct);background:#F0FDF4}
+.debug-item.wrong-bug{border-color:var(--wrong);background:#FEF2F2}
+.debug-num{width:26px;height:26px;border-radius:50%;background:var(--border);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.72rem;color:var(--muted);flex-shrink:0}
+.debug-text{font-family:'Space Mono',monospace;font-size:.75rem;font-weight:700;flex:1;line-height:1.4}
+.bug-icon{font-size:1.1rem;margin-left:auto}
+
+/* FILL BLANK PSEUDO */
+.fill-hint-text{font-size:.72rem;color:var(--muted);font-style:italic;padding:3px 0 0 14px}
+
+/* RESULTS */
+.results-body{text-align:center;padding:32px 20px}
+.res-stars{font-size:2.4rem;margin-bottom:12px;letter-spacing:3px;animation:popIn .5s ease}
+.res-score{font-size:3.5rem;font-weight:900;line-height:1;font-family:'Fredoka One',cursive}
+.res-label{font-size:.85rem;color:var(--muted);margin-bottom:18px}
+.res-msg{font-size:1rem;font-weight:700;padding:14px;border-radius:var(--radius);margin-bottom:18px;line-height:1.5}
+.res-msg.great{background:#F0FDF4;color:var(--loop-d)} .res-msg.ok{background:#FFFBEB;color:#92400E}
+.res-msg.retry{background:#FEF2F2;color:#991B1B}
+.res-acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.res-review{margin:14px 0;text-align:left;background:#fff;border-radius:var(--radius);padding:12px;border:2px solid var(--border)}
+.res-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:.82rem}
+.res-item:last-child{border-bottom:none}
+
+/* DASHBOARD */
+#dashboard{background:#0F172A;color:#fff}
+#dashboard .topbar{background:#1E293B;border-bottom-color:#334155}
+.dash-body{padding:16px}
+.dash-h{font-family:'Fredoka One',cursive;font-size:1.4rem;margin-bottom:4px}
+.dash-sub{color:#94A3B8;font-size:.82rem;margin-bottom:18px}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.dash-stat{background:#1E293B;border-radius:12px;padding:14px;text-align:center}
+.ds-val{font-family:'Fredoka One',cursive;font-size:2rem}
+.ds-lbl{font-size:.72rem;color:#94A3B8;margin-top:2px}
+.dash-stat.s-blue{border-left:4px solid #3B82F6} .dash-stat.s-green{border-left:4px solid #22C55E}
+.dash-stat.s-orange{border-left:4px solid #F97316} .dash-stat.s-purple{border-left:4px solid #A855F7}
+.prog-tbl{background:#1E293B;border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+.pt-head,.pt-row{display:grid;grid-template-columns:100px repeat(5,1fr);padding:10px 14px;gap:4px;align-items:center}
+.pt-head{background:#334155;font-size:.68rem;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:.04em}
+.pt-row{border-bottom:1px solid #334155}
+.pt-row:last-child{border:none}
+.pt-name{font-weight:700;font-size:.82rem}
+.pt-cell{text-align:center}
+.pt-pill{display:inline-block;padding:2px 7px;border-radius:10px;font-size:.67rem;font-weight:800}
+.pt-pill.done{background:#14532D;color:#86EFAC} .pt-pill.part{background:#713F12;color:#FDE68A}
+.pt-pill.none{background:#1E293B;color:#475569;border:1px solid #334155}
+.log-box{background:#1E293B;border-radius:var(--radius);overflow:hidden}
+.log-hdr{padding:12px 14px;font-weight:800;font-size:.88rem;border-bottom:1px solid #334155}
+.log-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid #0F172A;font-size:.78rem}
+.log-t{color:#64748B;font-family:'Space Mono',monospace;font-size:.65rem;min-width:40px}
+.log-s{font-weight:800}
+.log-a{color:#94A3B8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.log-p{font-weight:800}
+.log-p.hi{color:#22C55E} .log-p.mid{color:#F59E0B} .log-p.lo{color:#EF4444}
+
+/* PIN */
+.pin-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;
+  align-items:center;justify-content:center;z-index:200}
+.pin-overlay.show{display:flex}
+.pin-box{background:#1E293B;border-radius:var(--radius);padding:26px;width:290px;text-align:center}
+.pin-box h3{font-family:'Fredoka One',cursive;font-size:1.2rem;color:#fff;margin-bottom:4px}
+.pin-box p{color:#94A3B8;font-size:.83rem;margin-bottom:14px}
+.pin-input{width:100%;padding:9px;border-radius:8px;border:2px solid #334155;background:#0F172A;
+  color:#fff;font-family:'Space Mono',monospace;font-size:1.4rem;text-align:center;letter-spacing:7px;
+  margin-bottom:10px}
+.pin-input:focus{outline:none;border-color:#3B82F6}
+
+/* TOAST */
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(120px);
+  background:var(--text);color:#fff;padding:11px 18px;border-radius:12px;
+  font-weight:700;font-size:.87rem;z-index:300;transition:transform .3s ease;
+  box-shadow:0 4px 20px rgba(0,0,0,.2);max-width:90vw;text-align:center;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.t-ok{background:var(--correct)} .toast.t-err{background:var(--wrong)}
+.toast.t-hint{background:#7C3AED}
+
+/* CODE CHIP COLOURS */
+.cc-basic{background:#DBEAFE;border-color:#93C5FD;color:#1E40AF} .cc-basic .chip-dot{background:var(--basic)}
+.cc-loop{background:#DCFCE7;border-color:#86EFAC;color:#166534}   .cc-loop .chip-dot{background:var(--loop)}
+.cc-input{background:#FFEDD5;border-color:#FDB97D;color:#9A3412}  .cc-input .chip-dot{background:var(--input)}
+.cc-radio{background:#EDE9FE;border-color:#C4B5FD;color:#5B21B6}  .cc-radio .chip-dot{background:var(--radio)}
+.cc-music{background:#CCFBF1;border-color:#5EEAD4;color:#0F766E}  .cc-music .chip-dot{background:var(--music)}
+.cc-gray{background:#F1F5F9;border-color:#CBD5E1;color:#475569}    .cc-gray .chip-dot{background:#94A3B8}
+.cc-warn{background:#FFFBEB;border-color:#FDE68A;color:#92400E}    .cc-warn .chip-dot{background:var(--warn)}
+
+/* DRAG CHIP COLOURS (same names prefixed dc-) */
+.dc-basic{background:#DBEAFE;border-color:#93C5FD;color:#1E40AF}
+.dc-loop{background:#DCFCE7;border-color:#86EFAC;color:#166534}
+.dc-input{background:#FFEDD5;border-color:#FDB97D;color:#9A3412}
+.dc-radio{background:#EDE9FE;border-color:#C4B5FD;color:#5B21B6}
+.dc-music{background:#CCFBF1;border-color:#5EEAD4;color:#0F766E}
+.dc-gray{background:#F1F5F9;border-color:#CBD5E1;color:#475569}
+.dc-warn{background:#FEF3C7;border-color:#FCD34D;color:#92400E}
+
+/* ANIMATIONS */
+@keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}60%{transform:translateX(7px)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.pop-in{animation:popIn .3s ease}
+.fade-up{animation:fadeInUp .35s ease}
+
+
+/* ── CT CATEGORY FILTER BAR ── */
+.ct-filter-bar { padding: 10px 16px; background: #fff; border-bottom: 2px solid var(--border);
+  display: flex; gap: 7px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.ct-filter-bar::-webkit-scrollbar { display: none; }
+.ct-tab { display: flex; align-items: center; gap: 5px; padding: 6px 13px; border-radius: 20px;
+  border: 2px solid transparent; cursor: pointer; white-space: nowrap; font-family: 'Nunito', sans-serif;
+  font-weight: 800; font-size: .77rem; transition: all .2s; background: var(--bg); color: var(--muted); }
+.ct-tab:hover { transform: translateY(-1px); }
+.ct-tab.active { color: #fff; border-color: transparent; }
+.ct-tab .ct-icon { font-size: .9rem; }
+
+/* ── CT CATEGORY BADGE ON ACT ROW ── */
+.ct-cat-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px;
+  border-radius: 10px; font-size: .67rem; font-weight: 800; margin-left: 4px; vertical-align: middle; }
+
+/* ── CT CATEGORY SECTION HEADER ── */
+.cat-section-hdr { padding: 12px 16px 4px; display: flex; align-items: center; gap: 8px; }
+.cat-section-hdr .cs-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.cat-section-hdr .cs-label { font-family: 'Fredoka One', cursive; font-size: 1rem; }
+.cat-section-hdr .cs-sub { font-size: .72rem; color: var(--muted); }
+.cat-divider { height: 2px; margin: 4px 16px 8px; border-radius: 2px; opacity: .3; }
+
+/* ── CT CATEGORY INFO CARD (in activity) ── */
+.ct-cat-card { margin: 0 16px 10px; padding: 10px 14px; border-radius: 12px;
+  display: flex; align-items: center; gap: 10px; border: 2px solid; }
+.ct-cat-card .ctc-icon { font-size: 1.5rem; }
+.ct-cat-card .ctc-name { font-weight: 800; font-size: .9rem; }
+.ct-cat-card .ctc-desc { font-size: .75rem; margin-top: 1px; opacity: .8; }
+
+/* RESPONSIVE */
+@media(max-width:480px){
+  .pc-body{grid-template-columns:1fr}
+  .pc-bank{border-right:none;border-bottom:2px solid var(--border)}
+  .mode-grid{grid-template-columns:1fr}
+  .pt-head,.pt-row{grid-template-columns:80px repeat(5,1fr);font-size:.6rem}
+}
+</style>
+</head><body>
+<!-- ══════════ HOME ══════════ -->
+<div class="screen active" id="home">
+  <div class="topbar">
+    <div class="topbar-title">🤖 <span>DCTLP</span></div>
+    <div class="topbar-right">
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('bm')">BM</button>
+      </div>
+      <button class="icon-btn" onclick="openDashboard()" title="Teacher Dashboard">📊</button>
+    </div>
+  </div>
+  <div class="screen-body">
+    <div class="home-hero">
+      <div class="robot-badge">🤖</div>
+      <h1><em>DCTLP</em> – <span class="t" data-en="Digital CT Learning Platform" data-bm="Platform Pembelajaran CT Digital"></span></h1>
+      <p class="t" data-en="Choose your level and start learning Computational Thinking!" data-bm="Pilih tahap anda dan mula belajar Pemikiran Komputasional!"></p>
+    </div>
+    <div class="student-row">
+      <label class="t" data-en="👤 I am:" data-bm="👤 Saya:"></label>
+      <select id="studentSelect" onchange="G.student=this.value">
+        <option value="">-- Select / Pilih --</option>
+        <option value="S1">Student 1 / Murid 1</option>
+        <option value="S2">Student 2 / Murid 2</option>
+        <option value="S3">Student 3 / Murid 3</option>
+        <option value="S4">Student 4 / Murid 4</option>
+        <option value="S5">Student 5 / Murid 5</option>
+        <option value="S6">Student 6 / Murid 6</option>
+      </select>
+    </div>
+    <div class="level-grid" id="levelGrid"></div>
+  </div>
+</div>
+
+<!-- ══════════ MODE ══════════ -->
+<div class="screen" id="mode">
+  <div class="topbar">
+    <button class="btn-back" onclick="nav('home')">← <span class="t" data-en="Home" data-bm="Utama"></span></button>
+    <div class="topbar-title" id="modeTbarTitle"></div>
+    <div class="topbar-right"><div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('bm')">BM</button>
+    </div></div>
+  </div>
+  <div class="screen-body">
+    <div class="mode-hero">
+      <div class="mode-tag" id="modeTag"></div>
+      <h2 class="t" data-en="Choose Activity Type" data-bm="Pilih Jenis Aktiviti"></h2>
+      <p class="t" data-en="How do you want to learn this level?" data-bm="Bagaimana anda ingin belajar tahap ini?"></p>
+    </div>
+    <div class="mode-grid">
+      <div class="mode-card mc-unplug" onclick="nav('actlist','unplugged')">
+        <div class="mc-icon">🎮</div>
+        <div class="mc-title t" data-en="Unplugged Activities" data-bm="Aktiviti Tanpa Peranti"></div>
+        <div class="mc-desc t" data-en="Hands-on drag &amp; drop games — learn CT concepts without coding first" data-bm="Permainan seret &amp; lepas — belajar konsep CT tanpa pengekodan dahulu"></div>
+        <div class="mc-count" id="unplugCount"></div>
+      </div>
+      <div class="mode-card mc-plug" onclick="nav('actlist','plugged')">
+        <div class="mc-icon">💻</div>
+        <div class="mc-title t" data-en="Pseudocode Cards" data-bm="Kad Pseudokod"></div>
+        <div class="mc-desc t" data-en="Digital coding cards — arrange Micro:bit code blocks in the right order" data-bm="Kad kod digital — susun blok kod Micro:bit mengikut urutan betul"></div>
+        <div class="mc-count" id="plugCount"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ACTIVITY LIST ══════════ -->
+<div class="screen" id="actlist">
+  <div class="topbar">
+    <button class="btn-back" onclick="nav('mode')">← <span class="t" data-en="Back" data-bm="Kembali"></span></button>
+    <div class="topbar-title" id="actlistTitle"></div>
+    <div class="topbar-right"><div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('bm')">BM</button>
+    </div></div>
+  </div>
+  <div id="ctFilterBar" style="display:none"></div>
+  <div class="screen-body">
+    <div class="list-head"><h2 id="listHeading"></h2><p id="listSub"></p></div>
+    <div class="act-list" id="activityList"></div>
+  </div>
+</div>
+
+<!-- ══════════ ACTIVITY ══════════ -->
+<div class="screen" id="activity">
+  <div class="topbar">
+    <button class="btn-back" id="actBackBtn">← <span class="t" data-en="Back" data-bm="Kembali"></span></button>
+    <div class="topbar-title" id="actTbarTitle"></div>
+    <div class="topbar-right"><div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('bm')">BM</button>
+    </div></div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="actProgFill"></div></div>
+  <div class="screen-body" id="actBody"></div>
+</div>
+
+<!-- ══════════ RESULTS ══════════ -->
+<div class="screen" id="results">
+  <div class="topbar">
+    <div class="topbar-title">🏆 <span class="t" data-en="Results" data-bm="Keputusan"></span></div>
+    <div class="topbar-right"><div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('bm')">BM</button>
+    </div></div>
+  </div>
+  <div class="screen-body"><div class="results-body" id="resultsBody"></div></div>
+</div>
+
+<!-- ══════════ DASHBOARD ══════════ -->
+<div class="screen" id="dashboard">
+  <div class="topbar">
+    <button class="btn-back" style="color:#94A3B8" onclick="nav('home')">← <span class="t" data-en="Exit" data-bm="Keluar"></span></button>
+    <div class="topbar-title">📊 <span style="color:#60A5FA">Teacher Dashboard</span></div>
+    <div class="topbar-right">
+      <button class="btn btn-sm" style="background:#1E293B;color:#94A3B8;border:1px solid #334155" onclick="clearAllData()">🗑 Reset</button>
+    </div>
+  </div>
+  <div class="screen-body dash-body">
+    <div class="dash-h">Class Overview</div>
+    <div class="dash-sub">Real-time student progress. Dashboard PIN: <strong style="color:#60A5FA">1234</strong></div>
+    <div class="dash-grid" id="dashStats"></div>
+    <div class="prog-tbl">
+      <div class="pt-head">
+        <div>Student</div>
+        <div style="color:#93C5FD">Basic</div>
+        <div style="color:#86EFAC">Loop</div>
+        <div style="color:#FDB97D">Input</div>
+        <div style="color:#C4B5FD">Radio</div>
+        <div style="color:#5EEAD4">Music</div>
+      </div>
+      <div id="dashTable"></div>
+    </div>
+    <div class="log-box">
+      <div class="log-hdr">📋 <span class="t" data-en="Activity Log" data-bm="Log Aktiviti"></span></div>
+      <div id="dashLog"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PIN OVERLAY -->
+<div class="pin-overlay" id="pinOverlay">
+  <div class="pin-box">
+    <h3>🔒 Teacher Dashboard</h3>
+    <p>Enter PIN to access / Masukkan PIN</p>
+    <input class="pin-input" type="password" maxlength="4" id="pinInput" oninput="checkPin(this.value)" placeholder="••••">
+    <button class="btn btn-secondary" style="width:100%;margin-top:4px" onclick="closePinOverlay()">
+      <span class="t" data-en="Cancel" data-bm="Batal"></span>
+    </button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+<script>
+// ═══════════════════════════════════════════
+// GLOBAL STATE
+// ═══════════════════════════════════════════
+const G = {
+  lang: 'en', student: '', level: '', mode: '', actIdx: 0,
+  drag: null, dragSrc: null, selectedChip: null,
+  prog: {}, log: []
+};
+function loadStorage(){
+  try{ G.prog=JSON.parse(localStorage.getItem('dctlp2_prog')||'{}'); }catch(e){}
+  try{ G.log=JSON.parse(localStorage.getItem('dctlp2_log')||'[]'); }catch(e){}
+}
+function saveStorage(){
+  try{localStorage.setItem('dctlp2_prog',JSON.stringify(G.prog));}catch(e){}
+  try{localStorage.setItem('dctlp2_log',JSON.stringify(G.log));}catch(e){}
+}
+loadStorage();
+
+// ═══════════════════════════════════════════
+// LEVELS CONFIG
+// ═══════════════════════════════════════════
+const LEVELS=[
+  {id:'basic', en:'Basic',  bm:'Asas',  icon:'🔵', ct:'Pattern Recognition · Logical Reasoning',    cssVar:'--basic',  cls:'lv-basic'},
+  {id:'loop',  en:'Loop',   bm:'Gelung',icon:'🟢', ct:'Algorithmic Thinking · Pattern Recognition',  cssVar:'--loop',   cls:'lv-loop'},
+  {id:'input', en:'Input',  bm:'Input', icon:'🟠', ct:'Logical Reasoning · Abstraction',             cssVar:'--input',  cls:'lv-input'},
+  {id:'radio', en:'Radio',  bm:'Radio', icon:'🟣', ct:'Abstraction · Algorithmic Thinking',          cssVar:'--radio',  cls:'lv-radio', isNew:true},
+  {id:'music', en:'Music',  bm:'Muzik', icon:'🩵', ct:'Pattern Recognition · Algorithmic Thinking',  cssVar:'--music',  cls:'lv-music', isNew:true},
+];
+const lv = id => LEVELS.find(l=>l.id===id);
+
+// ═══════════════════════════════════════════
+// CONTENT: UNPLUGGED ACTIVITIES
+// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// CT CATEGORIES
+// ═══════════════════════════════════════════
+const CT_CATS = [
+  { id:'pattern',   en:'Pattern Recognition', bm:'Pengecaman Corak',      icon:'🔍', color:'#7C3AED', bg:'#EDE9FE', border:'#C4B5FD' },
+  { id:'logical',   en:'Logical Reasoning',   bm:'Penaakulan Logik',       icon:'🧠', color:'#2563EB', bg:'#DBEAFE', border:'#93C5FD' },
+  { id:'abstract',  en:'Abstraction',          bm:'Abstraksi',              icon:'🎯', color:'#0D9488', bg:'#CCFBF1', border:'#5EEAD4' },
+  { id:'algorithm', en:'Algorithmic Thinking', bm:'Pemikiran Algoritma',   icon:'⚙️', color:'#D97706', bg:'#FEF3C7', border:'#FCD34D' },
+];
+const ctCat = id => CT_CATS.find(c=>c.id===id);
+
+// ═══════════════════════════════════════════
+// UNPLUGGED ACTIVITIES — 4 per level (one per CT category)
+// ═══════════════════════════════════════════
+const UNPLUGGED = {
+
+// ─────────────────────────────────────────
+// LEVEL: BASIC
+// ─────────────────────────────────────────
+basic: [
+  // ── PATTERN RECOGNITION ────────────────
+  { en:'Spot the LED Pattern', bm:'Cari Corak LED',
+    ctCat:'pattern', ctEn:'Pattern Recognition', ctBm:'Pengecaman Corak',
+    type:'sequence',
+    briefEn:'The Micro:bit LEDs flash in a PATTERN — ON, OFF, ON, OFF. Drag the sequence cards to match the correct repeating pattern!',
+    briefBm:'LED Micro:bit berkelip dalam CORAK — HIDUP, PADAM, HIDUP, PADAM. Seret kad urutan untuk padankan corak berulang yang betul!',
+    items:[
+      {id:'a',en:'🟥 LED ON',   bm:'🟥 LED HIDUP', cls:'dc-basic'},
+      {id:'b',en:'⬛ LED OFF',  bm:'⬛ LED PADAM', cls:'dc-gray'},
+      {id:'c',en:'🟥 LED ON',   bm:'🟥 LED HIDUP', cls:'dc-basic'},
+      {id:'d',en:'⬛ LED OFF',  bm:'⬛ LED PADAM', cls:'dc-gray'},
+      {id:'e',en:'🟥 LED ON',   bm:'🟥 LED HIDUP', cls:'dc-basic'},
+      {id:'f',en:'⬛ LED OFF',  bm:'⬛ LED PADAM', cls:'dc-gray'},
+    ],
+    answer:['a','b','c','d','e','f'],
+    hintEn:'The pattern is: ON → OFF → ON → OFF → ON → OFF. It ALTERNATES each time!',
+    hintBm:'Coraknya ialah: HIDUP → PADAM → HIDUP → PADAM → HIDUP → PADAM. Ia BERTUKAR setiap kali!'
+  },
+
+  // ── LOGICAL REASONING ──────────────────
+  { en:'Morning Routine: Step by Step', bm:'Rutin Pagi: Langkah demi Langkah',
+    ctCat:'logical', ctEn:'Logical Reasoning', ctBm:'Penaakulan Logik',
+    type:'sequence',
+    briefEn:'A Micro:bit program runs in LOGICAL ORDER — each step depends on the one before it. Arrange the morning routine in the correct logical sequence!',
+    briefBm:'Program Micro:bit berjalan dalam URUTAN LOGIK — setiap langkah bergantung pada yang sebelumnya. Susun rutin pagi dalam urutan logik yang betul!',
+    items:[
+      {id:'a',en:'⏰ Wake up',         bm:'⏰ Bangun tidur',    cls:'dc-basic'},
+      {id:'b',en:'🚿 Shower',          bm:'🚿 Mandi',           cls:'dc-basic'},
+      {id:'c',en:'👕 Wear uniform',    bm:'👕 Pakai uniform',   cls:'dc-basic'},
+      {id:'d',en:'🍚 Eat breakfast',   bm:'🍚 Makan sarapan',   cls:'dc-basic'},
+      {id:'e',en:'🎒 Pack school bag', bm:'🎒 Kemas beg',       cls:'dc-basic'},
+      {id:'f',en:'🚶 Go to school',   bm:'🚶 Pergi ke sekolah',cls:'dc-basic'},
+    ],
+    answer:['a','b','c','d','e','f'],
+    hintEn:'You CANNOT wear uniform before showering! Think: what MUST come before each step?',
+    hintBm:'Anda TIDAK BOLEH pakai uniform sebelum mandi! Fikir: apa yang MESTI datang sebelum setiap langkah?'
+  },
+
+  // ── ABSTRACTION ────────────────────────
+  { en:'Keep Only What Matters', bm:'Simpan Hanya Yang Penting',
+    ctCat:'abstract', ctEn:'Abstraction', ctBm:'Abstraksi',
+    type:'select',
+    briefEn:'ABSTRACTION means removing details that do NOT matter for your task. Task: Show "Hello" once when Micro:bit starts. Select ONLY the blocks you need!',
+    briefBm:'ABSTRAKSI bermaksud membuang butiran yang TIDAK penting untuk tugasan anda. Tugasan: Tunjuk "Hello" sekali apabila Micro:bit bermula. Pilih SAHAJA blok yang anda perlukan!',
+    items:[
+      {id:'a',en:'▶️ on start',           bm:'▶️ pada mula',          cls:'dc-basic', correct:true},
+      {id:'b',en:'📺 show string "Hello"', bm:'📺 tunjuk rentetan "Hello"',cls:'dc-basic', correct:true},
+      {id:'c',en:'🔁 forever',             bm:'🔁 selama-lamanya',      cls:'dc-gray',  correct:false},
+      {id:'d',en:'⏸ pause 1000ms',         bm:'⏸ jeda 1000ms',         cls:'dc-gray',  correct:false},
+      {id:'e',en:'🔢 show number 5',       bm:'🔢 tunjuk nombor 5',     cls:'dc-gray',  correct:false},
+      {id:'f',en:'🔴 set LED x=2 y=2',     bm:'🔴 tetapkan LED x=2 y=2',cls:'dc-gray', correct:false},
+    ],
+    hintEn:'You only need 2 blocks: the START event and the SHOW action. Nothing else!',
+    hintBm:'Anda hanya perlukan 2 blok: peristiwa MULA dan tindakan TUNJUK. Tiada yang lain!'
+  },
+
+  // ── ALGORITHMIC THINKING ───────────────
+  { en:'Write the Robot\'s Instructions', bm:'Tulis Arahan Robot',
+    ctCat:'algorithm', ctEn:'Algorithmic Thinking', ctBm:'Pemikiran Algoritma',
+    type:'sequence',
+    briefEn:'An ALGORITHM is a set of exact instructions. The robot must: start, blink 3 times, then stop. Arrange the steps in the EXACT order!',
+    briefBm:'ALGORITMA adalah satu set arahan yang tepat. Robot mesti: mula, berkelip 3 kali, kemudian berhenti. Susun langkah-langkah mengikut urutan yang TEPAT!',
+    items:[
+      {id:'a',en:'▶️ START program',       bm:'▶️ MULA program',         cls:'dc-basic'},
+      {id:'b',en:'💡 Turn LED ON',          bm:'💡 Hidupkan LED',         cls:'dc-basic'},
+      {id:'c',en:'⏸ Wait 500ms',           bm:'⏸ Tunggu 500ms',         cls:'dc-gray'},
+      {id:'d',en:'⬛ Turn LED OFF',         bm:'⬛ Padamkan LED',         cls:'dc-gray'},
+      {id:'e',en:'🔁 Repeat steps 2–4 x3', bm:'🔁 Ulang langkah 2–4 x3',cls:'dc-basic'},
+      {id:'f',en:'⏹ END program',           bm:'⏹ TAMAT program',        cls:'dc-basic'},
+    ],
+    answer:['a','b','c','d','e','f'],
+    hintEn:'START first, then ON→wait→OFF (one blink), then REPEAT that 3 times, then END.',
+    hintBm:'MULA dahulu, kemudian HIDUP→tunggu→PADAM (satu kelipan), kemudian ULANG 3 kali, kemudian TAMAT.'
+  },
+],
+
+// ─────────────────────────────────────────
+// LEVEL: LOOP
+// ─────────────────────────────────────────
+loop: [
+  // ── PATTERN RECOGNITION ────────────────
+  { en:'What is the Loop Pattern?', bm:'Apakah Corak Gelung?',
+    ctCat:'pattern', ctEn:'Pattern Recognition', ctBm:'Pengecaman Corak',
+    type:'categorise',
+    briefEn:'Some tasks REPEAT (need a loop), others happen ONCE. Recognise the PATTERN — does this task repeat or not? Sort them!',
+    briefBm:'Sesetengah tugasan BERULANG (perlukan gelung), yang lain berlaku SEKALI. Kenali CORAK — adakah tugasan ini berulang atau tidak? Isihkan!',
+    items:[
+      {id:'a',en:'Count 1, 2, 3, 4, 5',      bm:'Kira 1, 2, 3, 4, 5',        cls:'dc-loop', cat:'loop'},
+      {id:'b',en:'Show name once',             bm:'Tunjuk nama sekali sahaja',  cls:'dc-basic', cat:'once'},
+      {id:'c',en:'Flash LED 10 times',         bm:'Kilat LED 10 kali',          cls:'dc-loop', cat:'loop'},
+      {id:'d',en:'Play one note',              bm:'Main satu nota sahaja',      cls:'dc-basic', cat:'once'},
+      {id:'e',en:'Scroll text across screen',  bm:'Tatal teks merentasi skrin', cls:'dc-loop', cat:'loop'},
+      {id:'f',en:'Show a smiley face once',    bm:'Tunjuk muka senyum sekali',  cls:'dc-basic', cat:'once'},
+      {id:'g',en:'Count down from 5 to 1',     bm:'Kira undur dari 5 ke 1',     cls:'dc-loop', cat:'loop'},
+      {id:'h',en:'Display student\'s score',   bm:'Paparkan skor pelajar',      cls:'dc-basic', cat:'once'},
+    ],
+    categories:[
+      {id:'loop', en:'🔁 Needs a LOOP (repeats)', bm:'🔁 Perlukan GELUNG (berulang)'},
+      {id:'once', en:'1️⃣ Happens ONCE (no loop)', bm:'1️⃣ Berlaku SEKALI (tiada gelung)'},
+    ],
+    hintEn:'If the task says "X times", "count", or "scroll" — it needs a loop! "Once" = no loop.',
+    hintBm:'Jika tugasan berkata "X kali", "kira", atau "tatal" — perlukan gelung! "Sekali" = tiada gelung.'
+  },
+
+  // ── LOGICAL REASONING ──────────────────
+  { en:'True or False: Does This Loop Work?', bm:'Betul atau Salah: Adakah Gelung Ini Berfungsi?',
+    ctCat:'logical', ctEn:'Logical Reasoning', ctBm:'Penaakulan Logik',
+    type:'debug',
+    briefEn:'This loop should display numbers 1, 2, 3, 4, 5 on the Micro:bit. Examine EACH step carefully — one step is LOGICALLY WRONG. Find it!',
+    briefBm:'Gelung ini sepatutnya memaparkan nombor 1, 2, 3, 4, 5 pada Micro:bit. Periksa SETIAP langkah dengan teliti — satu langkah LOGIKNYA SALAH. Carinya!',
+    sequence:[
+      {id:'a',en:'on start',               bm:'pada mula',                   cls:'dc-basic', isBug:false},
+      {id:'b',en:'for index = 1 to 5',     bm:'untuk indeks = 1 hingga 5',   cls:'dc-loop',  isBug:false},
+      {id:'c',en:'show string "hello"',    bm:'tunjuk rentetan "hello"',     cls:'dc-warn',  isBug:true},
+      {id:'d',en:'pause 500ms',            bm:'jeda 500ms',                  cls:'dc-basic', isBug:false},
+    ],
+    bugId:'c',
+    bugFixEn:'Fix: Change to → show number (index)',
+    bugFixBm:'Betulkan: Tukar kepada → tunjuk nombor (indeks)',
+    taskEn:'Goal: Display 1, 2, 3, 4, 5 — each number for 500ms.',
+    taskBm:'Matlamat: Paparkan 1, 2, 3, 4, 5 — setiap nombor selama 500ms.',
+    hintEn:'The goal is to show NUMBERS. Which step is showing TEXT ("hello") instead?',
+    hintBm:'Matlamatnya adalah untuk tunjuk NOMBOR. Langkah mana yang menunjukkan TEKS ("hello") sebaliknya?'
+  },
+
+  // ── ABSTRACTION ────────────────────────
+  { en:'Simplify the Instructions', bm:'Ringkaskan Arahan',
+    ctCat:'abstract', ctEn:'Abstraction', ctBm:'Abstraksi',
+    type:'select',
+    briefEn:'A student wrote 12 steps to count 1–5 by typing each individually. ABSTRACT it — select the MINIMUM blocks needed using a loop!',
+    briefBm:'Seorang pelajar menulis 12 langkah untuk mengira 1–5 dengan menaip setiap satu secara individu. ABSTRAKKAN — pilih blok MINIMUM yang diperlukan menggunakan gelung!',
+    items:[
+      {id:'a',en:'▶️ on start',            bm:'▶️ pada mula',              cls:'dc-basic', correct:true},
+      {id:'b',en:'🔁 for index 1 to 5',    bm:'🔁 untuk indeks 1 hingga 5',cls:'dc-loop',  correct:true},
+      {id:'c',en:'📺 show number(index)',   bm:'📺 tunjuk nombor(indeks)',  cls:'dc-loop',  correct:true},
+      {id:'d',en:'⏸ pause 500ms',          bm:'⏸ jeda 500ms',             cls:'dc-basic', correct:true},
+      {id:'e',en:'📺 show number 1',        bm:'📺 tunjuk nombor 1',        cls:'dc-gray',  correct:false},
+      {id:'f',en:'📺 show number 2',        bm:'📺 tunjuk nombor 2',        cls:'dc-gray',  correct:false},
+      {id:'g',en:'📺 show number 3',        bm:'📺 tunjuk nombor 3',        cls:'dc-gray',  correct:false},
+      {id:'h',en:'📺 show number 4',        bm:'📺 tunjuk nombor 4',        cls:'dc-gray',  correct:false},
+    ],
+    hintEn:'The LOOP solution needs only 4 blocks! on start + for loop + show number(index) + pause.',
+    hintBm:'Penyelesaian GELUNG hanya perlukan 4 blok! pada mula + gelung for + tunjuk nombor(indeks) + jeda.'
+  },
+
+  // ── ALGORITHMIC THINKING ───────────────
+  { en:'Build the Counting Algorithm', bm:'Bina Algoritma Mengira',
+    ctCat:'algorithm', ctEn:'Algorithmic Thinking', ctBm:'Pemikiran Algoritma',
+    type:'sequence',
+    briefEn:'Build a complete ALGORITHM to count 1 to 5 on Micro:bit, pausing between each number. Order EVERY step precisely!',
+    briefBm:'Bina ALGORITMA lengkap untuk mengira 1 hingga 5 pada Micro:bit, dengan jeda antara setiap nombor. Susun SETIAP langkah dengan tepat!',
+    items:[
+      {id:'a',en:'▶️ on start',              bm:'▶️ pada mula',               cls:'dc-basic'},
+      {id:'b',en:'🔁 for index = 1 to 5',    bm:'🔁 untuk indeks = 1 hingga 5',cls:'dc-loop'},
+      {id:'c',en:'📺 show number (index)',    bm:'📺 tunjuk nombor (indeks)',   cls:'dc-loop'},
+      {id:'d',en:'⏸ pause 800ms',            bm:'⏸ jeda 800ms',               cls:'dc-basic'},
+      {id:'e',en:'🔄 [end loop — go to next]',bm:'🔄 [tamat gelung — ke seterusnya]',cls:'dc-basic'},
+    ],
+    answer:['a','b','c','d','e'],
+    hintEn:'on start FIRST. Then the loop header. INSIDE the loop: show number, then pause. End loop last.',
+    hintBm:'"pada mula" DAHULU. Kemudian pengepala gelung. DI DALAM gelung: tunjuk nombor, kemudian jeda. Tamat gelung terakhir.'
+  },
+],
+
+// ─────────────────────────────────────────
+// LEVEL: INPUT
+// ─────────────────────────────────────────
+input: [
+  // ── PATTERN RECOGNITION ────────────────
+  { en:'Match the Event to its Pattern', bm:'Padankan Peristiwa dengan Coraknya',
+    ctCat:'pattern', ctEn:'Pattern Recognition', ctBm:'Pengecaman Corak',
+    type:'categorise',
+    briefEn:'In MakeCode, each GESTURE or BUTTON creates an event. Recognise the PATTERN — match each input event to what triggers it!',
+    briefBm:'Dalam MakeCode, setiap GERAK ISYARAT atau BUTANG mencipta peristiwa. Kenali CORAK — padankan setiap peristiwa input kepada pencetusnya!',
+    items:[
+      {id:'a',en:'📳 Device is shaken',    bm:'📳 Peranti digoncang',      cls:'dc-input', cat:'shake'},
+      {id:'b',en:'🅰️ Button A tapped',     bm:'🅰️ Butang A diketik',      cls:'dc-input', cat:'buttonA'},
+      {id:'c',en:'↩️ Tilted to the left',  bm:'↩️ Dicondongkan ke kiri',   cls:'dc-input', cat:'tiltL'},
+      {id:'d',en:'🅱️ Button B tapped',     bm:'🅱️ Butang B diketik',      cls:'dc-input', cat:'buttonB'},
+      {id:'e',en:'↪️ Tilted to the right', bm:'↪️ Dicondongkan ke kanan',  cls:'dc-input', cat:'tiltR'},
+      {id:'f',en:'⬇️ Turned face down',   bm:'⬇️ Dibalikkan ke bawah',   cls:'dc-input', cat:'facedown'},
+    ],
+    categories:[
+      {id:'shake',   en:'🌀 on shake',              bm:'🌀 apabila goncang'},
+      {id:'buttonA', en:'🅰️ on button A pressed',   bm:'🅰️ apabila butang A ditekan'},
+      {id:'buttonB', en:'🅱️ on button B pressed',   bm:'🅱️ apabila butang B ditekan'},
+      {id:'tiltL',   en:'↩️ on tilt left',           bm:'↩️ apabila condong kiri'},
+      {id:'tiltR',   en:'↪️ on tilt right',          bm:'↪️ apabila condong kanan'},
+      {id:'facedown',en:'⬇️ on face down',           bm:'⬇️ apabila hadap bawah'},
+    ],
+    hintEn:'Each physical action maps to exactly one event block in MakeCode!',
+    hintBm:'Setiap tindakan fizikal dipetakan kepada tepat satu blok peristiwa dalam MakeCode!'
+  },
+
+  // ── LOGICAL REASONING ──────────────────
+  { en:'If–Then Logic Chain', bm:'Rantaian Logik Jika–Maka',
+    ctCat:'logical', ctEn:'Logical Reasoning', ctBm:'Penaakulan Logik',
+    type:'sequence',
+    briefEn:'Event-driven programs follow IF–THEN logic: IF [event happens] THEN [do action]. Build the correct logical chain for 3 different button events!',
+    briefBm:'Program dipacu peristiwa mengikut logik JIKA–MAKA: JIKA [peristiwa berlaku] MAKA [buat tindakan]. Bina rantaian logik yang betul untuk 3 peristiwa butang berbeza!',
+    items:[
+      {id:'a',en:'🅰️ IF Button A pressed',  bm:'🅰️ JIKA Butang A ditekan',  cls:'dc-input'},
+      {id:'b',en:'❤️ THEN show heart',       bm:'❤️ MAKA tunjuk hati',        cls:'dc-input'},
+      {id:'c',en:'🅱️ IF Button B pressed',  bm:'🅱️ JIKA Butang B ditekan',  cls:'dc-input'},
+      {id:'d',en:'✖️ THEN show X',           bm:'✖️ MAKA tunjuk X',           cls:'dc-input'},
+      {id:'e',en:'🤝 IF Button A+B pressed', bm:'🤝 JIKA Butang A+B ditekan', cls:'dc-input'},
+      {id:'f',en:'😊 THEN show happy face',  bm:'😊 MAKA tunjuk muka gembira',cls:'dc-input'},
+    ],
+    answer:['a','b','c','d','e','f'],
+    hintEn:'Each IF must come BEFORE its THEN! A→heart, B→X, A+B→happy face.',
+    hintBm:'Setiap JIKA mesti datang SEBELUM MAKAnya! A→hati, B→X, A+B→muka gembira.'
+  },
+
+  // ── ABSTRACTION ────────────────────────
+  { en:'What Do I Really Need?', bm:'Apa Yang Saya Benar-Benar Perlukan?',
+    ctCat:'abstract', ctEn:'Abstraction', ctBm:'Abstraksi',
+    type:'select',
+    briefEn:'ABSTRACTION = strip away everything unnecessary. Task: Show an arrow pointing right when Micro:bit tilts right. Select ONLY the essential blocks!',
+    briefBm:'ABSTRAKSI = buang semua yang tidak perlu. Tugasan: Tunjuk anak panah ke kanan apabila Micro:bit condong ke kanan. Pilih SAHAJA blok yang penting!',
+    items:[
+      {id:'a',en:'↪️ on tilt right',         bm:'↪️ apabila condong kanan',  cls:'dc-input', correct:true},
+      {id:'b',en:'➡️ show arrow East',        bm:'➡️ tunjuk anak panah Timur',cls:'dc-input', correct:true},
+      {id:'c',en:'▶️ on start',               bm:'▶️ pada mula',              cls:'dc-gray',  correct:false},
+      {id:'d',en:'🔁 forever',                bm:'🔁 selama-lamanya',          cls:'dc-gray',  correct:false},
+      {id:'e',en:'🅰️ on button A pressed',   bm:'🅰️ apabila butang A ditekan',cls:'dc-gray', correct:false},
+      {id:'f',en:'⏸ pause 500ms',             bm:'⏸ jeda 500ms',              cls:'dc-gray',  correct:false},
+      {id:'g',en:'📺 show string "right"',    bm:'📺 tunjuk rentetan "kanan"', cls:'dc-gray',  correct:false},
+    ],
+    hintEn:'Only 2 blocks! The TRIGGER (tilt right) and the RESPONSE (show arrow). That\'s it!',
+    hintBm:'Hanya 2 blok! PENCETUS (condong kanan) dan TINDAK BALAS (tunjuk anak panah). Itulah sahaja!'
+  },
+
+  // ── ALGORITHMIC THINKING ───────────────
+  { en:'Build the Counter Algorithm', bm:'Bina Algoritma Pembilang',
+    ctCat:'algorithm', ctEn:'Algorithmic Thinking', ctBm:'Pemikiran Algoritma',
+    type:'sequence',
+    briefEn:'Build a COMPLETE algorithm: Button A increases a counter. Button B shows the current count. The variable must be set up FIRST!',
+    briefBm:'Bina ALGORITMA LENGKAP: Butang A menambah pembilang. Butang B menunjukkan kiraan semasa. Pemboleh ubah mesti disediakan DAHULU!',
+    items:[
+      {id:'a',en:'▶️ on start → set count = 0',  bm:'▶️ pada mula → tetapkan kiraan = 0', cls:'dc-basic'},
+      {id:'b',en:'🅰️ on button A pressed',        bm:'🅰️ apabila butang A ditekan',       cls:'dc-input'},
+      {id:'c',en:'➕ count = count + 1',           bm:'➕ kiraan = kiraan + 1',             cls:'dc-input'},
+      {id:'d',en:'🅱️ on button B pressed',        bm:'🅱️ apabila butang B ditekan',       cls:'dc-input'},
+      {id:'e',en:'📺 show number (count)',         bm:'📺 tunjuk nombor (kiraan)',          cls:'dc-input'},
+    ],
+    answer:['a','b','c','d','e'],
+    hintEn:'Step 1: initialise variable. Step 2–3: Button A event + increment. Step 4–5: Button B event + display.',
+    hintBm:'Langkah 1: permulakan pemboleh ubah. Langkah 2–3: Peristiwa Butang A + tambah. Langkah 4–5: Peristiwa Butang B + papar.'
+  },
+],
+
+// ─────────────────────────────────────────
+// LEVEL: RADIO
+// ─────────────────────────────────────────
+radio: [
+  // ── PATTERN RECOGNITION ────────────────
+  { en:'Recognise the Radio Flow', bm:'Kenali Aliran Radio',
+    ctCat:'pattern', ctEn:'Pattern Recognition', ctBm:'Pengecaman Corak',
+    type:'categorise',
+    briefEn:'Radio communication has a PATTERN: SEND commands go on one Micro:bit; RECEIVE commands go on the other. Recognise the pattern and sort each block!',
+    briefBm:'Komunikasi radio mempunyai CORAK: Arahan HANTAR ada pada satu Micro:bit; arahan TERIMA ada pada yang lain. Kenali corak dan isih setiap blok!',
+    items:[
+      {id:'a',en:'radio.setGroup(1)',          bm:'radio.tetapkanKumpulan(1)',  cls:'dc-radio', cat:'both'},
+      {id:'b',en:'on button A → sendNumber(1)',bm:'butang A → hantarNombor(1)',cls:'dc-radio', cat:'sender'},
+      {id:'c',en:'radio.sendString("Hi")',     bm:'radio.hantarRentetan("Hi")',cls:'dc-radio', cat:'sender'},
+      {id:'d',en:'on radio received (n)',      bm:'apabila terima radio (n)',   cls:'dc-radio', cat:'receiver'},
+      {id:'e',en:'show number (receivedNum)',  bm:'tunjuk nombor (noTerima)',   cls:'dc-radio', cat:'receiver'},
+      {id:'f',en:'on radio received (str)',    bm:'apabila terima rentetan',    cls:'dc-radio', cat:'receiver'},
+    ],
+    categories:[
+      {id:'sender',   en:'📤 Sender Micro:bit only',  bm:'📤 Micro:bit Penghantar sahaja'},
+      {id:'receiver', en:'📥 Receiver Micro:bit only', bm:'📥 Micro:bit Penerima sahaja'},
+      {id:'both',     en:'🔗 BOTH Micro:bits need it', bm:'🔗 KEDUA-DUA Micro:bit perlu'},
+    ],
+    hintEn:'setGroup MUST be on BOTH — without the same group number they cannot talk to each other!',
+    hintBm:'setGroup MESTI pada KEDUA-DUA — tanpa nombor kumpulan yang sama mereka tidak boleh berkomunikasi!'
+  },
+
+  // ── LOGICAL REASONING ──────────────────
+  { en:'Why Can\'t They Communicate?', bm:'Mengapa Mereka Tidak Boleh Berkomunikasi?',
+    ctCat:'logical', ctEn:'Logical Reasoning', ctBm:'Penaakulan Logik',
+    type:'debug',
+    briefEn:'Two students set up their Micro:bits for radio but they CANNOT receive each other\'s messages. Use LOGICAL REASONING to find the mistake!',
+    briefBm:'Dua pelajar menyediakan Micro:bit mereka untuk radio tetapi mereka TIDAK DAPAT menerima mesej antara satu sama lain. Gunakan PENAAKULAN LOGIK untuk cari kesilapan!',
+    sequence:[
+      {id:'a',en:'Micro:bit A → radio.setGroup(1)',  bm:'Micro:bit A → radio.tetapkanKumpulan(1)', cls:'dc-radio', isBug:false},
+      {id:'b',en:'Micro:bit A → on btn A → send(1)', bm:'Micro:bit A → butang A → hantar(1)',      cls:'dc-radio', isBug:false},
+      {id:'c',en:'Micro:bit B → radio.setGroup(2)',  bm:'Micro:bit B → radio.tetapkanKumpulan(2)', cls:'dc-warn',  isBug:true},
+      {id:'d',en:'Micro:bit B → on received → show', bm:'Micro:bit B → apabila terima → tunjuk',  cls:'dc-radio', isBug:false},
+    ],
+    bugId:'c',
+    bugFixEn:'Fix: Change setGroup(2) → setGroup(1) — same channel as Micro:bit A!',
+    bugFixBm:'Betulkan: Tukar tetapkanKumpulan(2) → tetapkanKumpulan(1) — saluran sama dengan Micro:bit A!',
+    taskEn:'Goal: Both Micro:bits must communicate using radio.',
+    taskBm:'Matlamat: Kedua-dua Micro:bit mesti berkomunikasi menggunakan radio.',
+    hintEn:'Radio is like a walkie-talkie — both must be on the SAME channel (group number)!',
+    hintBm:'Radio seperti walkie-talkie — kedua-dua mesti berada pada SALURAN YANG SAMA (nombor kumpulan)!'
+  },
+
+  // ── ABSTRACTION ────────────────────────
+  { en:'Strip It Down to the Essentials', bm:'Ringkaskan kepada Perkara Penting',
+    ctCat:'abstract', ctEn:'Abstraction', ctBm:'Abstraksi',
+    type:'select',
+    briefEn:'Task: When Button A is pressed, send number 42 to another Micro:bit. Select ONLY the essential blocks — ignore anything that is not needed!',
+    briefBm:'Tugasan: Apabila Butang A ditekan, hantar nombor 42 kepada Micro:bit lain. Pilih SAHAJA blok yang penting — abaikan apa yang tidak diperlukan!',
+    items:[
+      {id:'a',en:'radio.setGroup(1)',          bm:'radio.tetapkanKumpulan(1)',  cls:'dc-radio', correct:true},
+      {id:'b',en:'on button A pressed',        bm:'apabila butang A ditekan',  cls:'dc-input', correct:true},
+      {id:'c',en:'radio.sendNumber(42)',        bm:'radio.hantarNombor(42)',    cls:'dc-radio', correct:true},
+      {id:'d',en:'on radio received (n)',       bm:'apabila terima radio (n)',  cls:'dc-gray',  correct:false},
+      {id:'e',en:'show number (n)',             bm:'tunjuk nombor (n)',         cls:'dc-gray',  correct:false},
+      {id:'f',en:'forever',                     bm:'selama-lamanya',            cls:'dc-gray',  correct:false},
+      {id:'g',en:'pause 2000ms',               bm:'jeda 2000ms',               cls:'dc-gray',  correct:false},
+    ],
+    hintEn:'For SENDING only: setGroup + button trigger + sendNumber. The receive blocks are for the OTHER Micro:bit!',
+    hintBm:'Untuk MENGHANTAR sahaja: tetapkanKumpulan + pencetus butang + hantarNombor. Blok terima adalah untuk Micro:bit LAIN!'
+  },
+
+  // ── ALGORITHMIC THINKING ───────────────
+  { en:'Sequence the Full Radio Program', bm:'Urutkan Program Radio Penuh',
+    ctCat:'algorithm', ctEn:'Algorithmic Thinking', ctBm:'Pemikiran Algoritma',
+    type:'sequence',
+    briefEn:'Build the COMPLETE algorithm for a two-Micro:bit radio system: setup → sender logic → receiver logic. Every step in the RIGHT place!',
+    briefBm:'Bina ALGORITMA LENGKAP untuk sistem radio dua Micro:bit: persediaan → logik penghantar → logik penerima. Setiap langkah di TEMPAT YANG BETUL!',
+    items:[
+      {id:'a',en:'▶️ on start → radio.setGroup(1)',   bm:'▶️ pada mula → tetapkanKumpulan(1)',  cls:'dc-radio'},
+      {id:'b',en:'🅰️ on button A pressed',            bm:'🅰️ apabila butang A ditekan',        cls:'dc-input'},
+      {id:'c',en:'📤 radio.sendNumber(1)',             bm:'📤 radio.hantarNombor(1)',            cls:'dc-radio'},
+      {id:'d',en:'📥 on radio received (n)',           bm:'📥 apabila terima radio (n)',         cls:'dc-radio'},
+      {id:'e',en:'📺 show number (n)',                 bm:'📺 tunjuk nombor (n)',                cls:'dc-radio'},
+    ],
+    answer:['a','b','c','d','e'],
+    hintEn:'Setup FIRST. Then sender (button → send). Then receiver (on received → show). Two separate handlers!',
+    hintBm:'Persediaan DAHULU. Kemudian penghantar (butang → hantar). Kemudian penerima (apabila terima → tunjuk). Dua pengendali berasingan!'
+  },
+],
+
+// ─────────────────────────────────────────
+// LEVEL: MUSIC
+// ─────────────────────────────────────────
+music: [
+  // ── PATTERN RECOGNITION ────────────────
+  { en:'What is the Melody Pattern?', bm:'Apakah Corak Melodi?',
+    ctCat:'pattern', ctEn:'Pattern Recognition', ctBm:'Pengecaman Corak',
+    type:'sequence',
+    briefEn:'Music is built on PATTERNS — note lengths, rests, and repetition. Arrange these music blocks to build the correct Do-Re-Mi-Fa-Sol pattern!',
+    briefBm:'Muzik dibina atas CORAK — panjang nota, rehat, dan ulangan. Susun blok muzik ini untuk membina corak Do-Re-Mi-Fa-Sol yang betul!',
+    items:[
+      {id:'a', en:'🎵 play Do (1 beat)',  bm:'🎵 main Do (1 ketuk)',  cls:'dc-music'},
+      {id:'b1',en:'⏸ rest (½ beat)',      bm:'⏸ rehat (½ ketuk)',    cls:'dc-music'},
+      {id:'c', en:'🎵 play Re (1 beat)',  bm:'🎵 main Re (1 ketuk)',  cls:'dc-music'},
+      {id:'b2',en:'⏸ rest (½ beat)',      bm:'⏸ rehat (½ ketuk)',    cls:'dc-music'},
+      {id:'d', en:'🎵 play Mi (1 beat)',  bm:'🎵 main Mi (1 ketuk)',  cls:'dc-music'},
+      {id:'b3',en:'⏸ rest (½ beat)',      bm:'⏸ rehat (½ ketuk)',    cls:'dc-music'},
+      {id:'e', en:'🎵 play Fa (1 beat)',  bm:'🎵 main Fa (1 ketuk)',  cls:'dc-music'},
+      {id:'b4',en:'⏸ rest (½ beat)',      bm:'⏸ rehat (½ ketuk)',    cls:'dc-music'},
+      {id:'f', en:'🎵 play Sol (1 beat)', bm:'🎵 main Sol (1 ketuk)', cls:'dc-music'},
+    ],
+    answer:['a','b1','c','b2','d','b3','e','b4','f'],
+    hintEn:'The pattern is: note → short rest → note → short rest. Each note is separated by a half-beat rest!',
+    hintBm:'Coraknya ialah: nota → rehat pendek → nota → rehat pendek. Setiap nota dipisahkan oleh rehat separuh ketukan!'
+  },
+
+  // ── LOGICAL REASONING ──────────────────
+  { en:'Debug the Wrong Melody', bm:'Betulkan Melodi Yang Salah',
+    ctCat:'logical', ctEn:'Logical Reasoning', ctBm:'Penaakulan Logik',
+    type:'debug',
+    briefEn:'A student wants to play Do-Re-Mi but the melody sounds wrong — two notes are played in the WRONG LOGICAL ORDER. Find the mistake!',
+    briefBm:'Seorang pelajar mahu main Do-Re-Mi tetapi melodi kedengaran salah — dua nota dimainkan dalam URUTAN LOGIK YANG SALAH. Cari kesilapannya!',
+    sequence:[
+      {id:'a',en:'on start',              bm:'pada mula',              cls:'dc-basic', isBug:false},
+      {id:'b',en:'play tone Do (1 beat)', bm:'main nada Do (1 ketuk)', cls:'dc-music', isBug:false},
+      {id:'c',en:'play tone Mi (1 beat)', bm:'main nada Mi (1 ketuk)', cls:'dc-warn',  isBug:true},
+      {id:'d',en:'play tone Re (1 beat)', bm:'main nada Re (1 ketuk)', cls:'dc-music', isBug:false},
+    ],
+    bugId:'c',
+    bugFixEn:'Fix: Mi should come AFTER Re, not before. Do → Re → Mi is the correct scale order.',
+    bugFixBm:'Betulkan: Mi sepatutnya datang SELEPAS Re, bukan sebelum. Do → Re → Mi adalah urutan skala yang betul.',
+    taskEn:'Goal: Play the ascending scale Do → Re → Mi in the correct order.',
+    taskBm:'Matlamat: Main skala menaik Do → Re → Mi dalam urutan yang betul.',
+    hintEn:'Do-Re-Mi follows the musical SCALE order. Which two notes are swapped?',
+    hintBm:'Do-Re-Mi mengikut urutan SKALA muzik. Dua nota mana yang telah ditukar?'
+  },
+
+  // ── ABSTRACTION ────────────────────────
+  { en:'Choose Only the Music Blocks', bm:'Pilih Hanya Blok Muzik',
+    ctCat:'abstract', ctEn:'Abstraction', ctBm:'Abstraksi',
+    type:'select',
+    briefEn:'Task: Play a 3-note melody when Button A is pressed. ABSTRACT away the unnecessary blocks — select ONLY what is needed!',
+    briefBm:'Tugasan: Main melodi 3 nota apabila Butang A ditekan. ABSTRAKKAN blok yang tidak perlu — pilih SAHAJA yang diperlukan!',
+    items:[
+      {id:'a',en:'🅰️ on button A pressed',  bm:'🅰️ apabila butang A ditekan',cls:'dc-input', correct:true},
+      {id:'b',en:'🎵 play tone Do',           bm:'🎵 main nada Do',           cls:'dc-music', correct:true},
+      {id:'c',en:'🎵 play tone Re',           bm:'🎵 main nada Re',           cls:'dc-music', correct:true},
+      {id:'d',en:'🎵 play tone Mi',           bm:'🎵 main nada Mi',           cls:'dc-music', correct:true},
+      {id:'e',en:'▶️ on start',               bm:'▶️ pada mula',              cls:'dc-gray',  correct:false},
+      {id:'f',en:'🔁 forever',                bm:'🔁 selama-lamanya',          cls:'dc-gray',  correct:false},
+      {id:'g',en:'⏸ pause 1000ms',           bm:'⏸ jeda 1000ms',             cls:'dc-gray',  correct:false},
+      {id:'h',en:'📺 show string "music"',   bm:'📺 tunjuk rentetan "muzik"', cls:'dc-gray',  correct:false},
+    ],
+    hintEn:'4 blocks only: the button trigger + the 3 notes (Do, Re, Mi). No loops, no delays needed!',
+    hintBm:'4 blok sahaja: pencetus butang + 3 nota (Do, Re, Mi). Tiada gelung, tiada jeda diperlukan!'
+  },
+
+  // ── ALGORITHMIC THINKING ───────────────
+  { en:'Build the Music Algorithm', bm:'Bina Algoritma Muzik',
+    ctCat:'algorithm', ctEn:'Algorithmic Thinking', ctBm:'Pemikiran Algoritma',
+    type:'sequence',
+    briefEn:'Build a COMPLETE music algorithm: Button A plays a happy tune; Button B plays a sad tune. Every block in the precise order!',
+    briefBm:'Bina ALGORITMA MUZIK LENGKAP: Butang A main lagu gembira; Butang B main lagu sedih. Setiap blok dalam urutan yang tepat!',
+    items:[
+      {id:'a',en:'🅰️ on button A pressed',        bm:'🅰️ apabila butang A ditekan',     cls:'dc-input'},
+      {id:'b',en:'🎵 play melody "happy"',          bm:'🎵 main melodi "gembira"',         cls:'dc-music'},
+      {id:'c',en:'😊 show icon [happy face]',       bm:'😊 tunjuk ikon [muka gembira]',   cls:'dc-basic'},
+      {id:'d',en:'🅱️ on button B pressed',        bm:'🅱️ apabila butang B ditekan',     cls:'dc-input'},
+      {id:'e',en:'🎵 play melody "sadness"',        bm:'🎵 main melodi "kesedihan"',       cls:'dc-music'},
+      {id:'f',en:'😢 show icon [sad face]',         bm:'😢 tunjuk ikon [muka sedih]',     cls:'dc-basic'},
+    ],
+    answer:['a','b','c','d','e','f'],
+    hintEn:'Button A handler first (A→happy melody→happy face), then Button B handler (B→sad melody→sad face). Keep them in pairs!',
+    hintBm:'Pengendali Butang A dahulu (A→melodi gembira→muka gembira), kemudian pengendali Butang B (B→melodi sedih→muka sedih). Susun dalam pasangan!'
+  },
+],
+};
+
+const PSEUDOCARDS = {
+basic: [
+  // CARD 1 — beginner (2 slots)
+  { en:'Show your name once', bm:'Tunjukkan nama anda sekali',
+    ctEn:'Pattern Recognition', ctBm:'Pengecaman Corak', type:'arrange',
+    leds:[[0,1,0,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[0,1,0,1,0]],
+    blocks:[
+      {id:'a',en:'on start',           bm:'pada mula',          cls:'cc-basic',correct:true},
+      {id:'b',en:'show string "NAME"', bm:'tunjuk rentetan "NAMA"',cls:'cc-basic',correct:true},
+      {id:'c',en:'forever',            bm:'selama-lamanya',     cls:'cc-gray', correct:false},
+      {id:'d',en:'pause 500ms',        bm:'jeda 500ms',         cls:'cc-gray', correct:false},
+    ], slots:2, answer:['a','b'],
+    hintEn:'"on start" runs ONCE. Then show the name. No loop needed!',
+    hintBm:'"pada mula" berjalan SEKALI. Kemudian tunjuk nama. Tiada gelung diperlukan!'
+  },
+  // CARD 2 — intermediate (4 slots)
+  { en:'Show happy face, pause, show sad face — forever', bm:'Tunjuk muka gembira, jeda, tunjuk muka sedih — selama-lamanya',
+    ctEn:'Logical Reasoning', ctBm:'Penaakulan Logik', type:'arrange',
+    leds:[[0,1,0,1,0],[0,0,0,0,0],[1,0,0,0,1],[0,1,1,1,0],[0,0,0,0,0]],
+    blocks:[
+      {id:'a',en:'forever',          bm:'selama-lamanya',      cls:'cc-basic',correct:true},
+      {id:'b',en:'show icon [happy]',bm:'tunjuk ikon [gembira]',cls:'cc-basic',correct:true},
+      {id:'c',en:'pause 1000ms',     bm:'jeda 1000ms',         cls:'cc-basic',correct:true},
+      {id:'d',en:'show icon [sad]',  bm:'tunjuk ikon [sedih]', cls:'cc-basic',correct:true},
+      {id:'e',en:'on start',         bm:'pada mula',           cls:'cc-gray', correct:false},
+      {id:'f',en:'show number 1',    bm:'tunjuk nombor 1',     cls:'cc-gray', correct:false},
+    ], slots:4, answer:['a','b','c','d'],
+    hintEn:'forever WRAPS all steps. happy → pause → sad → (repeats).',
+    hintBm:'selama-lamanya MERANGKUMI semua langkah. gembira → jeda → sedih → (berulang).'
+  },
+  // CARD 3 — fill blank (prefilled slots)
+  { en:'Count from 0 to 4 and pause between each', bm:'Kira dari 0 hingga 4 dengan jeda antara setiap nombor',
+    ctEn:'Algorithmic Thinking', ctBm:'Pemikiran Algoritma', type:'fill',
+    leds:[[1,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1]],
+    blocks:[
+      {id:'a',en:'on start',           bm:'pada mula',          cls:'cc-basic',correct:true},
+      {id:'b',en:'for index 0 to 4',   bm:'untuk indeks 0 hingga 4',cls:'cc-loop',correct:true},
+      {id:'c',en:'show number(index)', bm:'tunjuk nombor(indeks)',cls:'cc-loop',correct:true},
+      {id:'d',en:'pause 500ms',        bm:'jeda 500ms',         cls:'cc-basic',correct:true},
+      {id:'e',en:'show string "hi"',   bm:'tunjuk rentetan "hi"',cls:'cc-gray',correct:false},
+      {id:'f',en:'forever',            bm:'selama-lamanya',     cls:'cc-gray',correct:false},
+    ],
+    prefilled:['a','b',null,'d'], // null = slot to fill
+    slots:4, answer:['a','b','c','d'],
+    hintEn:'Slot 3 is empty. What shows the number while the loop runs?',
+    hintBm:'Slot 3 kosong. Apa yang menunjukkan nombor semasa gelung berjalan?'
+  },
+],
+loop: [
+  // CARD 1
+  { en:'Show numbers 1 to 5', bm:'Tunjukkan nombor 1 hingga 5',
+    ctEn:'Algorithmic Thinking', ctBm:'Pemikiran Algoritma', type:'arrange',
+    leds:[[1,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1]],
+    blocks:[
+      {id:'a',en:'on start',           bm:'pada mula',          cls:'cc-basic',correct:true},
+      {id:'b',en:'for index 1 to 5',   bm:'untuk indeks 1 hingga 5',cls:'cc-loop',correct:true},
+      {id:'c',en:'show number(index)', bm:'tunjuk nombor(indeks)',cls:'cc-loop',correct:true},
+      {id:'d',en:'pause 1000ms',       bm:'jeda 1000ms',        cls:'cc-basic',correct:true},
+      {id:'e',en:'forever',            bm:'selama-lamanya',     cls:'cc-gray',correct:false},
+      {id:'f',en:'show string "5"',    bm:'tunjuk rentetan "5"',cls:'cc-gray',correct:false},
+    ], slots:4, answer:['a','b','c','d'],
+    hintEn:'for loop 1 to 5 → show number(index) → pause. "on start" always first!',
+    hintBm:'gelung for 1 hingga 5 → tunjuk nombor(indeks) → jeda. "pada mula" sentiasa pertama!'
+  },
+  // CARD 2 — nested (5 slots)
+  { en:'Flash LED 3 times then show checkmark', bm:'Kilat LED 3 kali kemudian tunjuk tanda semak',
+    ctEn:'Pattern Recognition · Algorithmic Thinking', ctBm:'Pengecaman Corak · Pemikiran Algoritma', type:'arrange',
+    leds:[[0,0,0,0,1],[0,0,0,1,0],[0,0,1,0,0],[0,1,0,0,0],[1,0,0,0,0]],
+    blocks:[
+      {id:'a',en:'on start',           bm:'pada mula',          cls:'cc-basic',correct:true},
+      {id:'b',en:'repeat 3 times',     bm:'ulang 3 kali',       cls:'cc-loop',correct:true},
+      {id:'c',en:'show icon [yes]',    bm:'tunjuk ikon [ya]',   cls:'cc-basic',correct:true},
+      {id:'d',en:'pause 200ms',        bm:'jeda 200ms',         cls:'cc-basic',correct:true},
+      {id:'e',en:'show icon [chkmark]',bm:'tunjuk ikon [semak]',cls:'cc-basic',correct:true},
+      {id:'f',en:'for index 0 to 4',  bm:'untuk indeks 0 hingga 4',cls:'cc-gray',correct:false},
+      {id:'g',en:'show number(index)',bm:'tunjuk nombor(indeks)',cls:'cc-gray',correct:false},
+    ], slots:5, answer:['a','b','c','d','e'],
+    hintEn:'on start → repeat 3 → flash icon → pause → then AFTER the loop, show checkmark.',
+    hintBm:'pada mula → ulang 3 → kilat ikon → jeda → kemudian SELEPAS gelung, tunjuk tanda semak.'
+  },
+  // CARD 3 — fill blank
+  { en:'Count down from 5 to 1', bm:'Kira undur dari 5 ke 1',
+    ctEn:'Algorithmic Thinking', ctBm:'Pemikiran Algoritma', type:'fill',
+    leds:[[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]],
+    blocks:[
+      {id:'a',en:'on start',           bm:'pada mula',          cls:'cc-basic',correct:true},
+      {id:'b',en:'for index 5 to 1 (step -1)',bm:'untuk indeks 5 ke 1 (langkah -1)',cls:'cc-loop',correct:true},
+      {id:'c',en:'show number(index)', bm:'tunjuk nombor(indeks)',cls:'cc-loop',correct:true},
+      {id:'d',en:'pause 800ms',        bm:'jeda 800ms',         cls:'cc-basic',correct:true},
+      {id:'e',en:'show string "Go!"',  bm:'tunjuk rentetan "Mula!"',cls:'cc-basic',correct:true},
+      {id:'f',en:'repeat 3 times',    bm:'ulang 3 kali',        cls:'cc-gray',correct:false},
+    ],
+    prefilled:['a',null,'c','d','e'],
+    slots:5, answer:['a','b','c','d','e'],
+    hintEn:'Slot 2 is the LOOP. Which loop counts DOWN from 5?',
+    hintBm:'Slot 2 adalah GELUNG. Gelung mana yang mengira turun dari 5?'
+  },
+],
+input: [
+  // CARD 1
+  { en:'Button A → heart, Button B → X', bm:'Butang A → hati, Butang B → X',
+    ctEn:'Abstraction', ctBm:'Abstraksi', type:'arrange',
+    leds:[[0,1,0,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0],[0,0,0,0,0]],
+    blocks:[
+      {id:'a',en:'on button A pressed', bm:'apabila butang A ditekan',cls:'cc-input',correct:true},
+      {id:'b',en:'show icon [heart]',   bm:'tunjuk ikon [hati]',     cls:'cc-input',correct:true},
+      {id:'c',en:'on button B pressed', bm:'apabila butang B ditekan',cls:'cc-input',correct:true},
+      {id:'d',en:'show icon [X]',       bm:'tunjuk ikon [X]',        cls:'cc-input',correct:true},
+      {id:'e',en:'on start',            bm:'pada mula',              cls:'cc-gray', correct:false},
+      {id:'f',en:'forever',             bm:'selama-lamanya',         cls:'cc-gray', correct:false},
+    ], slots:4, answer:['a','b','c','d'],
+    hintEn:'Two separate event handlers. Button A block MUST come before the heart. Button B before X.',
+    hintBm:'Dua pengendali peristiwa berasingan. Blok Butang A MESTI datang sebelum hati. Butang B sebelum X.'
+  },
+  // CARD 2 — 5 slots
+  { en:'Shake → show arrow; Tilt left → show left arrow', bm:'Goncang → tunjuk anak panah; Tilt kiri → tunjuk anak panah kiri',
+    ctEn:'Logical Reasoning · Abstraction', ctBm:'Penaakulan Logik · Abstraksi', type:'arrange',
+    leds:[[0,0,1,0,0],[0,1,0,0,0],[1,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0]],
+    blocks:[
+      {id:'a',en:'on shake',            bm:'apabila goncang',          cls:'cc-input',correct:true},
+      {id:'b',en:'show arrow North',    bm:'tunjuk anak panah Utara',  cls:'cc-input',correct:true},
+      {id:'c',en:'on tilt left',        bm:'apabila condong kiri',     cls:'cc-input',correct:true},
+      {id:'d',en:'show arrow West',     bm:'tunjuk anak panah Barat',  cls:'cc-input',correct:true},
+      {id:'e',en:'clear screen',        bm:'bersihkan skrin',          cls:'cc-input',correct:true},
+      {id:'f',en:'on button A pressed', bm:'apabila butang A ditekan', cls:'cc-gray', correct:false},
+      {id:'g',en:'on start',            bm:'pada mula',                cls:'cc-gray', correct:false},
+    ], slots:5, answer:['a','b','c','d','e'],
+    hintEn:'Each gesture has its own event block. End with clear screen.',
+    hintBm:'Setiap gerak isyarat mempunyai blok peristiwanya sendiri. Tamat dengan bersihkan skrin.'
+  },
+  // CARD 3 — fill blank
+  { en:'Button A → count up; Button B → show count', bm:'Butang A → kira naik; Butang B → tunjuk kiraan',
+    ctEn:'Abstraction · Algorithmic Thinking', ctBm:'Abstraksi · Pemikiran Algoritma', type:'fill',
+    leds:[[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]],
+    blocks:[
+      {id:'a',en:'let count = 0',      bm:'biarkan kiraan = 0',        cls:'cc-basic',correct:true},
+      {id:'b',en:'on button A pressed',bm:'apabila butang A ditekan',  cls:'cc-input',correct:true},
+      {id:'c',en:'count = count + 1',  bm:'kiraan = kiraan + 1',       cls:'cc-input',correct:true},
+      {id:'d',en:'on button B pressed',bm:'apabila butang B ditekan',  cls:'cc-input',correct:true},
+      {id:'e',en:'show number(count)', bm:'tunjuk nombor(kiraan)',     cls:'cc-input',correct:true},
+      {id:'f',en:'pause 1000ms',       bm:'jeda 1000ms',               cls:'cc-gray',correct:false},
+    ],
+    prefilled:['a','b',null,null,'e'],
+    slots:5, answer:['a','b','c','d','e'],
+    hintEn:'Slots 3 and 4 are missing. Slot 3 increases the count. Slot 4 is the Button B event.',
+    hintBm:'Slot 3 dan 4 kosong. Slot 3 menambah kiraan. Slot 4 adalah peristiwa Butang B.'
+  },
+],
+radio: [
+  // CARD 1
+  { en:'Send number when Button A pressed', bm:'Hantar nombor apabila Butang A ditekan',
+    ctEn:'Algorithmic Thinking', ctBm:'Pemikiran Algoritma', type:'arrange',
+    leds:[[1,0,1,0,1],[0,1,0,1,0],[1,0,1,0,1],[0,1,0,1,0],[1,0,1,0,1]],
+    blocks:[
+      {id:'a',en:'on start → radio.setGroup(1)',       bm:'pada mula → radio.tetapkanKumpulan(1)', cls:'cc-radio',correct:true},
+      {id:'b',en:'on button A → radio.sendNumber(1)',  bm:'butang A → radio.hantarNombor(1)',      cls:'cc-radio',correct:true},
+      {id:'c',en:'on radio received(n) → show num(n)',bm:'terima radio(n) → tunjuk nombor(n)',    cls:'cc-radio',correct:true},
+      {id:'d',en:'forever',                           bm:'selama-lamanya',                        cls:'cc-gray',correct:false},
+      {id:'e',en:'on start → show string "radio"',    bm:'pada mula → tunjuk "radio"',            cls:'cc-gray',correct:false},
+    ], slots:3, answer:['a','b','c'],
+    hintEn:'setGroup first. Then sender logic. Then receiver handler. Only 3 blocks needed!',
+    hintBm:'tetapkanKumpulan dahulu. Kemudian logik penghantar. Kemudian pengendali penerima. Hanya 3 blok!'
+  },
+  // CARD 2 — 4 slots
+  { en:'Send a string message between two Micro:bits', bm:'Hantar mesej rentetan antara dua Micro:bit',
+    ctEn:'Abstraction · Algorithmic Thinking', ctBm:'Abstraksi · Pemikiran Algoritma', type:'arrange',
+    leds:[[0,1,1,1,0],[1,0,0,0,1],[1,0,1,0,1],[1,0,0,0,1],[0,1,1,1,0]],
+    blocks:[
+      {id:'a',en:'on start → radio.setGroup(5)',        bm:'pada mula → radio.tetapkanKumpulan(5)',  cls:'cc-radio',correct:true},
+      {id:'b',en:'on button A → radio.sendString("Hi")',bm:'butang A → radio.hantarRentetan("Hi")',  cls:'cc-radio',correct:true},
+      {id:'c',en:'on received(str) → show string(str)', bm:'terima(str) → tunjuk rentetan(str)',     cls:'cc-radio',correct:true},
+      {id:'d',en:'on button B → show icon [yes]',      bm:'butang B → tunjuk ikon [ya]',            cls:'cc-input',correct:true},
+      {id:'e',en:'radio.sendNumber(1)',                 bm:'radio.hantarNombor(1)',                  cls:'cc-gray',correct:false},
+      {id:'f',en:'on start → show string "Go"',        bm:'pada mula → tunjuk "Pergi"',             cls:'cc-gray',correct:false},
+    ], slots:4, answer:['a','b','c','d'],
+    hintEn:'Group 5 setup → send STRING not number → receive string → Button B feedback.',
+    hintBm:'Tetapkan kumpulan 5 → hantar RENTETAN bukan nombor → terima rentetan → maklum balas Butang B.'
+  },
+  // CARD 3 — fill blank
+  { en:'Two-way radio communication', bm:'Komunikasi radio dua hala',
+    ctEn:'Abstraction', ctBm:'Abstraksi', type:'fill',
+    leds:[[1,1,0,1,1],[1,0,0,0,1],[0,0,0,0,0],[1,0,0,0,1],[1,1,0,1,1]],
+    blocks:[
+      {id:'a',en:'on start → radio.setGroup(3)',        bm:'pada mula → tetapkanKumpulan(3)',   cls:'cc-radio',correct:true},
+      {id:'b',en:'on button A → radio.sendNumber(1)',   bm:'butang A → hantarNombor(1)',        cls:'cc-radio',correct:true},
+      {id:'c',en:'on button B → radio.sendNumber(2)',   bm:'butang B → hantarNombor(2)',        cls:'cc-radio',correct:true},
+      {id:'d',en:'on received(n): if n=1 → icon[yes]', bm:'terima(n): jika n=1 → ikon[ya]',   cls:'cc-radio',correct:true},
+      {id:'e',en:'on received(n): if n=2 → icon[no]',  bm:'terima(n): jika n=2 → ikon[tidak]',cls:'cc-radio',correct:true},
+      {id:'f',en:'forever',                             bm:'selama-lamanya',                   cls:'cc-gray',correct:false},
+    ],
+    prefilled:['a',null,null,'d','e'],
+    slots:5, answer:['a','b','c','d','e'],
+    hintEn:'Slots 2 and 3 send different numbers. Button A sends 1, Button B sends 2.',
+    hintBm:'Slot 2 dan 3 menghantar nombor berbeza. Butang A hantar 1, Butang B hantar 2.'
+  },
+],
+music: [
+  // CARD 1
+  { en:'Play Do-Re-Mi melody', bm:'Main melodi Do-Re-Mi',
+    ctEn:'Algorithmic Thinking', ctBm:'Pemikiran Algoritma', type:'arrange',
+    leds:[[0,0,1,0,0],[0,1,0,1,0],[1,0,0,0,1],[0,0,0,0,0],[0,0,0,0,0]],
+    blocks:[
+      {id:'a',en:'on start',                bm:'pada mula',               cls:'cc-basic',correct:true},
+      {id:'b',en:'music.playTone(Do,1 beat)',bm:'muzik.mainNada(Do,1 ketuk)',cls:'cc-music',correct:true},
+      {id:'c',en:'music.rest(1 beat)',       bm:'muzik.rehat(1 ketukan)',  cls:'cc-music',correct:true},
+      {id:'d',en:'music.playTone(Re,1 beat)',bm:'muzik.mainNada(Re,1 ketuk)',cls:'cc-music',correct:true},
+      {id:'e',en:'music.playTone(Mi,1 beat)',bm:'muzik.mainNada(Mi,1 ketuk)',cls:'cc-music',correct:true},
+      {id:'f',en:'forever',                 bm:'selama-lamanya',          cls:'cc-gray',correct:false},
+      {id:'g',en:'show string "music"',     bm:'tunjuk rentetan "muzik"', cls:'cc-gray',correct:false},
+    ], slots:5, answer:['a','b','c','d','e'],
+    hintEn:'on start → Do → rest → Re → Mi. Note-rest-note pattern!',
+    hintBm:'pada mula → Do → rehat → Re → Mi. Corak nota-rehat-nota!'
+  },
+  // CARD 2 — 5 slots
+  { en:'Play a looping alert melody', bm:'Main melodi amaran bergelung',
+    ctEn:'Pattern Recognition · Algorithmic Thinking', ctBm:'Pengecaman Corak · Pemikiran Algoritma', type:'arrange',
+    leds:[[1,1,1,1,1],[1,0,0,0,0],[1,1,1,0,0],[1,0,0,0,0],[1,1,1,1,1]],
+    blocks:[
+      {id:'a',en:'forever',                    bm:'selama-lamanya',            cls:'cc-basic',correct:true},
+      {id:'b',en:'music.playTone(High C,beat)',bm:'muzik.mainNada(C Tinggi,ketuk)',cls:'cc-music',correct:true},
+      {id:'c',en:'music.rest(beat)',           bm:'muzik.rehat(ketukan)',      cls:'cc-music',correct:true},
+      {id:'d',en:'music.playTone(Low C,beat)', bm:'muzik.mainNada(C Rendah,ketuk)',cls:'cc-music',correct:true},
+      {id:'e',en:'pause 500ms',                bm:'jeda 500ms',               cls:'cc-basic',correct:true},
+      {id:'f',en:'on start',                   bm:'pada mula',                cls:'cc-gray',correct:false},
+      {id:'g',en:'on button A pressed',        bm:'apabila butang A ditekan', cls:'cc-gray',correct:false},
+    ], slots:5, answer:['a','b','c','d','e'],
+    hintEn:'forever → High C → rest → Low C → pause (then repeats forever).',
+    hintBm:'selama-lamanya → C Tinggi → rehat → C Rendah → jeda (kemudian berulang selama-lamanya).'
+  },
+  // CARD 3 — fill blank
+  { en:'Button A plays a happy tune; Button B plays a sad tune', bm:'Butang A main lagu gembira; Butang B main lagu sedih',
+    ctEn:'Abstraction · Algorithmic Thinking', ctBm:'Abstraksi · Pemikiran Algoritma', type:'fill',
+    leds:[[0,1,0,1,0],[0,0,0,0,0],[0,0,1,0,0],[1,0,0,0,1],[0,1,1,1,0]],
+    blocks:[
+      {id:'a',en:'on button A pressed',       bm:'apabila butang A ditekan',  cls:'cc-input',correct:true},
+      {id:'b',en:'music.playMelody("happy")', bm:'muzik.mainMelodi("gembira")',cls:'cc-music',correct:true},
+      {id:'c',en:'on button B pressed',       bm:'apabila butang B ditekan',  cls:'cc-input',correct:true},
+      {id:'d',en:'music.playMelody("sad")',   bm:'muzik.mainMelodi("sedih")', cls:'cc-music',correct:true},
+      {id:'e',en:'forever',                   bm:'selama-lamanya',            cls:'cc-gray',correct:false},
+      {id:'f',en:'on start',                  bm:'pada mula',                 cls:'cc-gray',correct:false},
+    ],
+    prefilled:[null,'b',null,'d'],
+    slots:4, answer:['a','b','c','d'],
+    hintEn:'Slots 1 and 3 are the TRIGGERS (button events). Slot 1 = Button A, Slot 3 = Button B.',
+    hintBm:'Slot 1 dan 3 adalah PENCETUS (peristiwa butang). Slot 1 = Butang A, Slot 3 = Butang B.'
+  },
+],
+};
+</script>
+<script>
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function nav(screenId, modeArg) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0, 0);
+  if (screenId === 'home')    { renderHome(); }
+  if (screenId === 'mode')    { renderMode(); }
+  if (screenId === 'actlist') { G.mode = modeArg; G.ctFilter = 'all'; renderActList(); }
+  refreshLang();
+}
+
+function openDashboard() {
+  document.getElementById('pinOverlay').classList.add('show');
+  document.getElementById('pinInput').value = '';
+  setTimeout(() => document.getElementById('pinInput').focus(), 100);
+}
+function closePinOverlay() { document.getElementById('pinOverlay').classList.remove('show'); }
+function checkPin(v) {
+  if (v === '1234') {
+    closePinOverlay();
+    renderDashboard();
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('dashboard').classList.add('active');
+    refreshLang();
+  }
+}
+function clearAllData() {
+  if (!confirm('Delete ALL student data?\nPadam SEMUA data pelajar?')) return;
+  G.prog = {}; G.log = []; saveStorage(); renderDashboard();
+  showToast(G.lang === 'bm' ? 'Data dipadam!' : 'All data cleared!', 'ok');
+}
+
+// ═══════════════════════════════════════
+// LANGUAGE
+// ═══════════════════════════════════════
+function setLang(l) {
+  G.lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b =>
+    b.classList.toggle('active', b.textContent.trim() === l.toUpperCase()));
+  refreshLang();
+}
+function refreshLang() {
+  document.querySelectorAll('[data-en]').forEach(el => {
+    el.textContent = el.getAttribute('data-' + G.lang) || el.getAttribute('data-en');
+  });
+}
+function T(obj) { return obj ? (G.lang === 'bm' && obj.bm ? obj.bm : obj.en) : ''; }
+
+// ═══════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════
+function renderHome() {
+  const grid = document.getElementById('levelGrid');
+  grid.innerHTML = LEVELS.map((lv, i) => {
+    const pct = calcLevelProgress(lv.id);
+    return `<div class="level-card ${lv.cls} pop-in fade-up" style="animation-delay:${i * 0.07}s" onclick="selectLevel('${lv.id}')">
+      ${lv.isNew ? '<div class="new-badge">NEW</div>' : ''}
+      <div class="lv-icon">${lv.icon}</div>
+      <div class="lv-name">${T(lv)}</div>
+      <div class="lv-ct">${lv.ct}</div>
+      <div class="lv-prog-wrap"><div class="lv-prog-bar" style="width:${pct}%"></div></div>
+      <div class="lv-prog-text">${pct}% ${G.lang === 'bm' ? 'selesai' : 'complete'}</div>
+    </div>`;
+  }).join('');
+}
+
+function calcLevelProgress(lvId) {
+  if (!G.student) return 0;
+  const u = (UNPLUGGED[lvId] || []).length;
+  const p = (PSEUDOCARDS[lvId] || []).length;
+  const total = u + p; if (!total) return 0;
+  let done = 0;
+  for (let i = 0; i < u; i++) if (G.prog[`${G.student}_${lvId}_u_${i}`]?.done) done++;
+  for (let i = 0; i < p; i++) if (G.prog[`${G.student}_${lvId}_p_${i}`]?.done) done++;
+  return Math.round(done / total * 100);
+}
+
+function selectLevel(id) {
+  if (!G.student) { showToast(G.lang === 'bm' ? '⚠️ Sila pilih nama murid dahulu!' : '⚠️ Please select your name first!', 'err'); return; }
+  G.level = id; nav('mode');
+}
+
+// ═══════════════════════════════════════
+// MODE
+// ═══════════════════════════════════════
+function renderMode() {
+  const l = lv(G.level);
+  const tag = document.getElementById('modeTag');
+  tag.textContent = T(l);
+  tag.style.background = `var(${l.cssVar}-l)`;
+  tag.style.color = `var(${l.cssVar})`;
+  document.getElementById('modeTbarTitle').innerHTML = `${l.icon} <span>${T(l)}</span>`;
+  const uCount = (UNPLUGGED[G.level] || []).length;
+  const pCount = (PSEUDOCARDS[G.level] || []).length;
+  document.getElementById('unplugCount').textContent = uCount + (G.lang === 'bm' ? ' aktiviti (4 kategori CT)' : ' activities (4 CT categories)');
+  document.getElementById('plugCount').textContent = pCount + (G.lang === 'bm' ? ' kad pseudokod' : ' pseudocode cards');
+}
+
+// ═══════════════════════════════════════
+// ACTIVITY LIST
+// ═══════════════════════════════════════
+function renderActList() {
+  const l = lv(G.level);
+  const isUnplug = G.mode === 'unplugged';
+  const acts = isUnplug ? (UNPLUGGED[G.level] || []) : (PSEUDOCARDS[G.level] || []);
+  const modeKey = isUnplug ? 'u' : 'p';
+
+  document.getElementById('actlistTitle').innerHTML = `${l.icon} ${T(l)}`;
+  document.getElementById('listHeading').textContent = isUnplug
+    ? (G.lang === 'bm' ? '🎮 Aktiviti Tanpa Peranti' : '🎮 Unplugged Activities')
+    : (G.lang === 'bm' ? '💻 Kad Pseudokod' : '💻 Pseudocode Cards');
+
+  if (!acts.length) {
+    document.getElementById('ctFilterBar').style.display = 'none';
+    document.getElementById('listSub').textContent = '';
+    document.getElementById('activityList').innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted)">
+      <div style="font-size:3rem;margin-bottom:10px">🚧</div>
+      <div style="font-weight:800">${G.lang === 'bm' ? 'Akan datang!' : 'Coming soon!'}</div></div>`;
+    return;
+  }
+
+  // Build CT filter bar (only for unplugged — which has ctCat field)
+  const filterBar = document.getElementById('ctFilterBar');
+  if (isUnplug) {
+    filterBar.style.display = 'block';
+    filterBar.className = 'ct-filter-bar';
+    const allLabel = G.lang === 'bm' ? 'Semua' : 'All';
+    filterBar.innerHTML = `
+      <div class="ct-tab active" id="ctf_all" onclick="filterCT('all')" style="background:var(--text);color:#fff">
+        ✨ ${allLabel}
+      </div>` +
+      CT_CATS.map(cat => `
+        <div class="ct-tab" id="ctf_${cat.id}" onclick="filterCT('${cat.id}')"
+             style="background:${cat.bg};color:${cat.color};border-color:${cat.border}">
+          <span class="ct-icon">${cat.icon}</span>
+          <span>${G.lang === 'bm' ? cat.bm : cat.en}</span>
+        </div>`).join('');
+  } else {
+    filterBar.style.display = 'none';
+  }
+
+  G.ctFilter = G.ctFilter || 'all';
+  if (!isUnplug) G.ctFilter = 'all';
+  renderActListItems(acts, modeKey, isUnplug, l);
+}
+
+function filterCT(catId) {
+  G.ctFilter = catId;
+  document.querySelectorAll('.ct-tab').forEach(t => {
+    const tid = t.id.replace('ctf_', '');
+    t.classList.toggle('active', tid === catId);
+    if (tid === catId) {
+      if (catId === 'all') { t.style.background = 'var(--text)'; t.style.color = '#fff'; }
+      // cat tabs keep their bg colour — already set via inline style
+    } else {
+      if (tid === 'all') { t.style.background = 'var(--bg)'; t.style.color = 'var(--muted)'; }
+    }
+  });
+  const l = lv(G.level);
+  const isUnplug = G.mode === 'unplugged';
+  const acts = UNPLUGGED[G.level] || [];
+  renderActListItems(acts, 'u', isUnplug, l);
+}
+
+function renderActListItems(acts, modeKey, isUnplug, l) {
+  const typeLabels    = { sequence:'Sequence', categorise:'Sort', debug:'Debug 🐛', select:'Select', arrange:'Arrange', fill:'Fill Blank' };
+  const typeLabelsBm  = { sequence:'Urutan', categorise:'Isih', debug:'Debug 🐛', select:'Pilih', arrange:'Susun', fill:'Isi Kosong' };
+  const filterCat = G.ctFilter || 'all';
+
+  let html = '';
+
+  if (isUnplug && filterCat === 'all') {
+    // Group by CT category
+    CT_CATS.forEach(cat => {
+      const catActs = acts.map((a,i) => ({...a, origIdx:i})).filter(a => a.ctCat === cat.id);
+      if (!catActs.length) return;
+      html += `<div class="cat-section-hdr">
+        <div class="cs-dot" style="background:${cat.color}"></div>
+        <div>
+          <div class="cs-label" style="color:${cat.color}">${cat.icon} ${G.lang === 'bm' ? cat.bm : cat.en}</div>
+          <div class="cs-sub">${catActs.length} ${G.lang === 'bm' ? 'aktiviti' : 'activities'}</div>
+        </div>
+      </div>
+      <div class="cat-divider" style="background:${cat.color}"></div>`;
+      catActs.forEach((act) => {
+        html += actRowHtml(act, act.origIdx, modeKey, l, typeLabels, typeLabelsBm, cat);
+      });
+    });
+  } else {
+    // Filtered or pseudocode
+    const filtered = acts.map((a,i) => ({...a, origIdx:i})).filter(a =>
+      !isUnplug || filterCat === 'all' || a.ctCat === filterCat
+    );
+    if (!filtered.length) {
+      html = `<div style="text-align:center;padding:32px;color:var(--muted)">
+        <div style="font-size:2.5rem;margin-bottom:8px">🔍</div>
+        <div style="font-weight:700">${G.lang === 'bm' ? 'Tiada aktiviti dalam kategori ini' : 'No activities in this category'}</div>
+      </div>`;
+    } else {
+      filtered.forEach(act => {
+        const cat = isUnplug ? ctCat(act.ctCat) : null;
+        html += actRowHtml(act, act.origIdx, modeKey, l, typeLabels, typeLabelsBm, cat);
+      });
+    }
+  }
+
+  const count = isUnplug && filterCat !== 'all'
+    ? acts.filter(a => a.ctCat === filterCat).length
+    : acts.length;
+  document.getElementById('listSub').textContent = count + (G.lang === 'bm' ? ' aktiviti tersedia' : ' activities available');
+  document.getElementById('activityList').innerHTML = html;
+}
+
+function actRowHtml(act, idx, modeKey, l, typeLabels, typeLabelsBm, cat) {
+  const key = `${G.student}_${G.level}_${modeKey}_${idx}`;
+  const rec = G.prog[key];
+  const done = rec?.done;
+  const tLabel = G.lang === 'bm' ? (typeLabelsBm[act.type] || act.type) : (typeLabels[act.type] || act.type);
+  const scoreStr = done ? ` · ${rec.pct}%` : '';
+  const catBadge = cat ? `<span class="ct-cat-badge" style="background:${cat.bg};color:${cat.color};border:1px solid ${cat.border}">
+    ${cat.icon} ${G.lang === 'bm' ? cat.bm : cat.en}
+  </span>` : '';
+  return `<div class="act-row ${done ? 'done' : ''} fade-up" onclick="startActivity(${idx})">
+    <div class="act-num" style="background:var(${l.cssVar})">${idx + 1}</div>
+    <div class="act-info">
+      <div class="act-name">${T(act)}</div>
+      <div class="act-meta">${catBadge}
+        <span class="type-badge" style="background:var(${l.cssVar}-l);color:var(${l.cssVar})">${tLabel}</span>${scoreStr}
+      </div>
+    </div>
+    <div class="act-status">${done ? '✅' : '▶️'}</div>
+  </div>`;
+}
+
+
+function startActivity(idx) {
+  G.actIdx = idx;
+  const l = lv(G.level);
+  const isUnplug = G.mode === 'unplugged';
+  const acts = isUnplug ? (UNPLUGGED[G.level] || []) : (PSEUDOCARDS[G.level] || []);
+  const total = acts.length;
+  document.getElementById('actBackBtn').onclick = () => nav('actlist', G.mode);
+  document.getElementById('actTbarTitle').innerHTML = `${l.icon} ${T(l)}`;
+  document.getElementById('actProgFill').style.width = `${(idx / total) * 100}%`;
+  document.getElementById('actProgFill').style.background = `var(${l.cssVar})`;
+  G.selectedChip = null;
+  if (isUnplug) renderUnpluggedActivity(acts[idx], idx);
+  else renderPseudocard(acts[idx], idx);
+  nav('activity');
+  document.getElementById('activity').classList.add('active'); // nav already set it
+}
+
+// ═══════════════════════════════════════
+// ACTIVITY RENDERERS
+// ═══════════════════════════════════════
+
+// ── SEQUENCE ──────────────────────────
+function renderUnpluggedActivity(act, idx) {
+  const body = document.getElementById('actBody');
+  if (act.type === 'sequence') renderSequence(body, act, idx);
+  else if (act.type === 'categorise') renderCategorise(body, act, idx);
+  else if (act.type === 'debug') renderDebug(body, act, idx);
+  else if (act.type === 'select') renderSelect(body, act, idx);
+}
+
+function actHeader(act, idx, mode) {
+  const l = lv(G.level);
+  const acts = mode === 'unplugged' ? (UNPLUGGED[G.level] || []) : (PSEUDOCARDS[G.level] || []);
+  const cat = act.ctCat ? ctCat(act.ctCat) : null;
+  const catBanner = cat ? `<div class="ct-cat-card" style="background:${cat.bg};border-color:${cat.border};color:${cat.color}">
+    <div class="ctc-icon">${cat.icon}</div>
+    <div>
+      <div class="ctc-name">${G.lang === 'bm' ? cat.bm : cat.en}</div>
+      <div class="ctc-desc">${G.lang === 'bm' ? getCatDescBm(cat.id) : getCatDescEn(cat.id)}</div>
+    </div>
+  </div>` : '';
+  return `<div class="act-header">
+    <div class="act-title">${T(act)}</div>
+    <div class="act-sub">Activity ${idx + 1}/${acts.length}</div>
+  </div>
+  ${catBanner}
+  <div class="task-box">
+    <div class="tb-icon">💡</div>
+    <div class="tb-text">${G.lang === 'bm' ? act.briefBm : act.briefEn}</div>
+  </div>`;
+}
+
+function getCatDescEn(catId) {
+  const d = {
+    pattern:   'Finding repeating elements and structures',
+    logical:   'Using IF–THEN reasoning to solve problems',
+    abstract:  'Keeping only what is essential for the task',
+    algorithm: 'Writing exact step-by-step instructions',
+  };
+  return d[catId] || '';
+}
+function getCatDescBm(catId) {
+  const d = {
+    pattern:   'Mencari elemen dan struktur yang berulang',
+    logical:   'Menggunakan penaakulan JIKA–MAKA untuk selesaikan masalah',
+    abstract:  'Menyimpan hanya apa yang penting untuk tugasan',
+    algorithm: 'Menulis arahan langkah demi langkah yang tepat',
+  };
+  return d[catId] || '';
+}
+
+function actionBtns(checkFn, resetFn, hintMsg) {
+  return `<div class="act-btns">
+    <button class="btn btn-primary" onclick="${checkFn}">✅ ${G.lang === 'bm' ? 'Semak Jawapan' : 'Check Answer'}</button>
+    <button class="btn btn-secondary" onclick="${resetFn}">🔄 ${G.lang === 'bm' ? 'Cuba Semula' : 'Reset'}</button>
+    <button class="hint-btn" onclick="showHint('${hintMsg.replace(/'/g,"&#39;")}')">💡 ${G.lang === 'bm' ? 'Petunjuk' : 'Hint'}</button>
+  </div>`;
+}
+
+// SEQUENCE
+function renderSequence(body, act, idx) {
+  const items = shuffle([...act.items]);
+  body.innerHTML = actHeader(act, idx, 'unplugged') + `
+  <div class="dnd-wrap">
+    <div class="dnd-section-label">📦 ${G.lang === 'bm' ? 'Bank Item — Seret ke bawah!' : 'Item Bank — Drag to sequence below!'}</div>
+    <div class="item-bank" id="itemBank" ondragover="bankDragOver(event)" ondrop="bankDrop(event)">
+      ${items.map(it => chipHtml(it, 'dc', 'bank')).join('')}
+    </div>
+    <div class="dnd-section-label">📋 ${G.lang === 'bm' ? 'Urutan Anda' : 'Your Sequence'}</div>
+    <div id="dropZones">
+      ${act.answer.map((_, i) => `
+        <div class="drop-row" id="dz${i}" ondragover="dzDragOver(event)" ondragleave="dzDragLeave(event)" ondrop="dzDrop(event,${i})">
+          <div class="slot-num">${i + 1}</div>
+          <div class="slot-hint">${G.lang === 'bm' ? 'Lepaskan di sini' : 'Drop here'}</div>
+        </div>`).join('')}
+    </div>
+  </div>` + actionBtns(`checkSeq(${idx})`, `startActivity(${idx})`, G.lang === 'bm' ? act.hintBm : act.hintEn);
+  initMobileTap();
+}
+
+// CATEGORISE
+function renderCategorise(body, act, idx) {
+  const items = shuffle([...act.items]);
+  body.innerHTML = actHeader(act, idx, 'unplugged') + `
+  <div class="dnd-wrap">
+    <div class="dnd-section-label">📦 ${G.lang === 'bm' ? 'Item — Seret ke kategori' : 'Items — Drag to category'}</div>
+    <div class="item-bank" id="itemBank" ondragover="bankDragOver(event)" ondrop="bankDrop(event)">
+      ${items.map(it => chipHtml(it, 'dc', 'bank')).join('')}
+    </div>
+  </div>
+  <div class="cat-zones">
+    ${act.categories.map(cat => `
+      <div class="cat-zone-wrap">
+        <div class="cat-zone-hdr" style="background:var(${lv(G.level).cssVar}-l);color:var(${lv(G.level).cssVar})">${T(cat)}</div>
+        <div class="cat-zone-body" id="cat_${cat.id}" data-cat="${cat.id}"
+             ondragover="catOver(event)" ondragleave="catLeave(event)" ondrop="catDrop(event,'${cat.id}')">
+          <div class="cat-empty">${G.lang === 'bm' ? 'Lepaskan di sini…' : 'Drop items here…'}</div>
+        </div>
+      </div>`).join('')}
+  </div>` + actionBtns(`checkCat(${idx})`, `startActivity(${idx})`, G.lang === 'bm' ? act.hintBm : act.hintEn);
+  initMobileTap();
+}
+
+// SELECT
+function renderSelect(body, act, idx) {
+  body.innerHTML = actHeader(act, idx, 'unplugged') + `
+  <div class="dnd-wrap">
+    <div class="dnd-section-label">👆 ${G.lang === 'bm' ? 'Ketik blok yang DIPERLUKAN' : 'Tap the blocks you NEED'}</div>
+  </div>
+  <div class="select-grid">
+    ${act.items.map(it => `
+      <div class="sel-chip ${it.cls.replace('dc-','dc-')}" id="sel_${it.id}" onclick="toggleSel('${it.id}')">
+        <span>${T(it)}</span>
+      </div>`).join('')}
+  </div>` + actionBtns(`checkSel(${idx})`, `startActivity(${idx})`, G.lang === 'bm' ? act.hintBm : act.hintEn);
+}
+
+// DEBUG
+function renderDebug(body, act, idx) {
+  body.innerHTML = actHeader(act, idx, 'unplugged') + `
+  <div class="dnd-wrap">
+    <div class="dnd-section-label">🔍 ${G.lang === 'bm' ? 'Ketik langkah yang SALAH' : 'Tap the WRONG step'}</div>
+    <div style="font-size:.78rem;color:var(--muted);margin-bottom:8px">
+      🎯 ${G.lang === 'bm' ? act.taskBm : act.taskEn}
+    </div>
+  </div>
+  <div class="debug-sequence">
+    ${act.sequence.map((item, i) => `
+      <div class="debug-item" id="dbg_${item.id}" onclick="tapDebug('${item.id}','${act.bugId}',${idx})">
+        <div class="debug-num">${i + 1}</div>
+        <div class="debug-text ${item.cls.replace('dc-','cc-')}">${T(item)}</div>
+        <div class="bug-icon">🔍</div>
+      </div>`).join('')}
+  </div>
+  <div class="act-btns">
+    <button class="hint-btn" onclick="showHint('${(G.lang === 'bm' ? act.hintBm : act.hintEn).replace(/'/g,"&#39;")}')">💡 ${G.lang === 'bm' ? 'Petunjuk' : 'Hint'}</button>
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+// PSEUDOCODE CARD RENDERER
+// ═══════════════════════════════════════
+function renderPseudocard(card, idx) {
+  const body = document.getElementById('actBody');
+  const l = lv(G.level);
+  const ledHtml = card.leds.map(row => row.map(v => `<div class="led ${v ? 'on' : 'off'}"></div>`).join('')).join('');
+  const freeBlocks = card.blocks.filter(b => {
+    if (card.type === 'fill') {
+      // in fill mode, prefilled blocks not in bank
+      const usedInPrefill = (card.prefilled || []).filter(Boolean);
+      return !usedInPrefill.includes(b.id) || !b.correct;
+    }
+    return !b.correct || true; // show all in bank, correct ones draggable
+  });
+  const bankBlocks = card.type === 'fill'
+    ? card.blocks.filter(b => !(card.prefilled || []).includes(b.id))
+    : shuffle([...card.blocks]);
+
+  body.innerHTML = `
+  <div class="act-header">
+    <div class="act-title">💻 ${G.lang === 'bm' ? 'Kad Pseudokod' : 'Pseudocode Card'} ${idx + 1}/${(PSEUDOCARDS[G.level] || []).length}</div>
+    <div class="act-sub">🎯 ${G.lang === 'bm' ? (card.ctBm || card.ctEn) : card.ctEn}</div>
+  </div>
+  <div class="task-box">
+    <div class="tb-icon">🎯</div>
+    <div class="tb-text"><strong>${G.lang === 'bm' ? 'Tugasan:' : 'Task:'}</strong> ${T(card)}</div>
+  </div>
+  <div class="pc-wrap">
+    <div class="pc-card">
+      <div class="pc-top">
+        <div class="pc-task">${T(card)}</div>
+        <div class="pc-microbit">
+          <div class="mb-display">${ledHtml}</div>
+          <div class="mb-label">${G.lang === 'bm' ? 'Paparan LED Micro:bit' : 'Micro:bit LED display'}</div>
+        </div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-bank">
+          <div class="pc-section-lbl">📦 ${G.lang === 'bm' ? 'Bank Kod' : 'Code Bank'}</div>
+          <div class="code-blocks" id="codeBank">
+            ${shuffle([...bankBlocks]).map(b => codeChipHtml(b)).join('')}
+          </div>
+        </div>
+        <div class="pc-seq">
+          <div class="pc-section-lbl">📋 ${G.lang === 'bm' ? 'Urutan Kod Anda' : 'Your Code Sequence'}</div>
+          <div class="seq-slots" id="seqSlots">
+            ${Array(card.slots).fill(0).map((_, i) => {
+              const preId = card.type === 'fill' ? (card.prefilled || [])[i] : null;
+              const preBlock = preId ? card.blocks.find(b => b.id === preId) : null;
+              if (preBlock) {
+                return `<div class="seq-slot prefilled" data-idx="${i}" data-id="${preBlock.id}">
+                  <span class="slot-idx">${i + 1}</span>
+                  ${codeChipHtmlInline(preBlock)}
+                </div>`;
+              }
+              return `<div class="seq-slot" data-idx="${i}" id="ss${i}"
+                ondragover="ssDragOver(event)" ondragleave="ssDragLeave(event)" ondrop="ssDrop(event,${i})">
+                <span class="slot-idx">${i + 1}</span>
+                <span style="color:var(--muted);font-size:.68rem;font-style:italic">${G.lang === 'bm' ? 'lepaskan di sini' : 'drop here'}</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="pc-actions">
+        <button class="btn btn-primary btn-sm" onclick="checkPseudo(${idx})">✅ ${G.lang === 'bm' ? 'Semak' : 'Check'}</button>
+        <button class="btn btn-secondary btn-sm" onclick="startActivity(${idx})">🔄 ${G.lang === 'bm' ? 'Semula' : 'Reset'}</button>
+        <button class="hint-btn" onclick="showHint('${(G.lang === 'bm' ? card.hintBm : card.hintEn).replace(/'/g,"&#39;")}')">💡 ${G.lang === 'bm' ? 'Petunjuk' : 'Hint'}</button>
+      </div>
+    </div>
+  </div>`;
+  initPseudoMobileTap();
+}
+
+// ── CHIP HTML HELPERS ──────────────────
+function chipHtml(item, prefix, src) {
+  const cls = item.cls || (prefix + '-gray');
+  return `<div class="${prefix === 'dc' ? 'drag-chip' : 'code-chip'} ${cls}" 
+    draggable="true" data-id="${item.id}" data-src="${src}"
+    ondragstart="onDragStart(event)" ondragend="onDragEnd(event)">
+    ${T(item)}
+  </div>`;
+}
+function codeChipHtml(b) {
+  return `<div class="code-chip ${b.cls}" draggable="true" data-id="${b.id}" data-src="codeBank"
+    ondragstart="onDragStart(event)" ondragend="onDragEnd(event)">
+    <div class="chip-dot"></div>${T(b)}
+  </div>`;
+}
+function codeChipHtmlInline(b) {
+  return `<div class="code-chip ${b.cls}" style="cursor:default;pointer-events:none">
+    <div class="chip-dot"></div>${T(b)}
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+// DRAG & DROP
+// ═══════════════════════════════════════
+function onDragStart(e) {
+  G.drag = e.currentTarget;
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', e.currentTarget.dataset.id);
+}
+function onDragEnd(e) { e.currentTarget.classList.remove('dragging'); }
+
+// Drop zone (sequence rows)
+function dzDragOver(e)  { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function dzDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function dzDrop(e, idx) {
+  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+  if (!G.drag) return;
+  const zone = document.getElementById('dz' + idx);
+  const existing = zone.querySelector('.drag-chip');
+  if (existing) returnToBank(existing);
+  const clone = G.drag.cloneNode(true);
+  clone.draggable = true;
+  clone.dataset.src = 'zone';
+  clone.ondragstart = onDragStart;
+  clone.ondragend = onDragEnd;
+  zone.querySelector('.slot-hint')?.remove();
+  zone.innerHTML = '';
+  const num = document.createElement('div'); num.className = 'slot-num'; num.textContent = idx + 1;
+  zone.appendChild(num); zone.appendChild(clone);
+  G.drag.remove(); G.drag = null;
+}
+
+// Bank drop (return)
+function bankDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('highlight-drop'); }
+function bankDrop(e) {
+  e.preventDefault(); e.currentTarget.classList.remove('highlight-drop');
+  if (!G.drag) return;
+  const clone = G.drag.cloneNode(true);
+  clone.draggable = true; clone.dataset.src = 'bank';
+  clone.ondragstart = onDragStart; clone.ondragend = onDragEnd;
+  document.getElementById('itemBank')?.appendChild(clone);
+  G.drag.remove(); G.drag = null;
+}
+
+// Category zones
+function catOver(e)  { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function catLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function catDrop(e, catId) {
+  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+  if (!G.drag) return;
+  const zone = document.getElementById('cat_' + catId);
+  zone.querySelector('.cat-empty')?.remove();
+  const clone = G.drag.cloneNode(true);
+  clone.draggable = true; clone.dataset.src = 'cat'; clone.dataset.cat = catId;
+  clone.ondragstart = onDragStart; clone.ondragend = onDragEnd;
+  zone.appendChild(clone);
+  G.drag.remove(); G.drag = null;
+}
+
+// Pseudocard seq slots
+function ssDragOver(e)  { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function ssDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function ssDrop(e, idx) {
+  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+  if (!G.drag) return;
+  const slot = document.getElementById('ss' + idx);
+  if (!slot) return;
+  const existing = slot.querySelector('.code-chip');
+  if (existing) { existing.remove(); returnCodeToBank(existing); }
+  const clone = G.drag.cloneNode(true);
+  clone.draggable = true; clone.dataset.src = 'slot';
+  clone.ondragstart = onDragStart; clone.ondragend = onDragEnd;
+  slot.innerHTML = `<span class="slot-idx">${idx + 1}</span>`;
+  slot.appendChild(clone);
+  G.drag.remove(); G.drag = null;
+}
+
+function returnToBank(chip) {
+  const bank = document.getElementById('itemBank');
+  if (!bank) return;
+  const clone = chip.cloneNode(true);
+  clone.draggable = true; clone.dataset.src = 'bank';
+  clone.ondragstart = onDragStart; clone.ondragend = onDragEnd;
+  bank.appendChild(clone);
+}
+function returnCodeToBank(chip) {
+  const bank = document.getElementById('codeBank');
+  if (!bank) return;
+  const clone = chip.cloneNode(true);
+  clone.draggable = true; clone.dataset.src = 'codeBank';
+  clone.ondragstart = onDragStart; clone.ondragend = onDragEnd;
+  bank.appendChild(clone);
+}
+
+// ═══════════════════════════════════════
+// MOBILE TAP-TO-PLACE
+// ═══════════════════════════════════════
+function initMobileTap() {
+  setTimeout(() => {
+    document.querySelectorAll('.drag-chip').forEach(chip => {
+      chip.addEventListener('click', function(e) {
+        if (G.selectedChip === this) {
+          this.classList.remove('selected'); G.selectedChip = null; return;
+        }
+        if (G.selectedChip) G.selectedChip.classList.remove('selected');
+        G.selectedChip = this; this.classList.add('selected');
+      });
+    });
+    document.querySelectorAll('.drop-row').forEach((zone, i) => {
+      zone.addEventListener('click', function() {
+        if (!G.selectedChip) return;
+        const existing = this.querySelector('.drag-chip');
+        if (existing) returnToBank(existing);
+        const clone = G.selectedChip.cloneNode(true);
+        clone.draggable = true; clone.dataset.src = 'zone';
+        clone.ondragstart = onDragStart; clone.ondragend = onDragEnd;
+        this.querySelector('.slot-hint')?.remove();
+        this.innerHTML = '';
+        const num = document.createElement('div'); num.className = 'slot-num'; num.textContent = i + 1;
+        this.appendChild(num); this.appendChild(clone);
+        G.selectedChip.remove(); G.selectedChip = null;
+        initMobileTap();
+      });
+    });
+    document.querySelectorAll('.cat-zone-body').forEach(zone => {
+      zone.addEventListener('click', function() {
+        if (!G.selectedChip) return;
+        const catId = this.dataset.cat;
+        this.querySelector('.cat-empty')?.remove();
+        const clone = G.selectedChip.cloneNode(true);
+        clone.draggable = true; clone.dataset.src = 'cat'; clone.dataset.cat = catId;
+        clone.ondragstart = onDragStart; clone.ondragend = onDragEnd;
+        this.appendChild(clone);
+        G.selectedChip.remove(); G.selectedChip = null;
+        initMobileTap();
+      });
+    });
+  }, 50);
+}
+
+function initPseudoMobileTap() {
+  setTimeout(() => {
+    document.querySelectorAll('.code-chip[draggable="true"]').forEach(chip => {
+      chip.addEventListener('click', function() {
+        if (G.selectedChip === this) { this.classList.remove('selected'); G.selectedChip = null; return; }
+        if (G.selectedChip) G.selectedChip.classList.remove('selected');
+        G.selectedChip = this; this.classList.add('selected');
+      });
+    });
+    document.querySelectorAll('.seq-slot:not(.prefilled)').forEach((slot, i) => {
+      slot.addEventListener('click', function() {
+        if (!G.selectedChip) return;
+        const idx = parseInt(this.dataset.idx);
+        const existing = this.querySelector('.code-chip');
+        if (existing) { existing.remove(); returnCodeToBank(existing); }
+        const clone = G.selectedChip.cloneNode(true);
+        clone.draggable = true; clone.dataset.src = 'slot';
+        clone.ondragstart = onDragStart; clone.ondragend = onDragEnd;
+        this.innerHTML = `<span class="slot-idx">${idx + 1}</span>`;
+        this.appendChild(clone);
+        G.selectedChip.remove(); G.selectedChip = null;
+        initPseudoMobileTap();
+      });
+    });
+  }, 50);
+}
+
+// ═══════════════════════════════════════
+// SELECT ACTIVITY
+// ═══════════════════════════════════════
+function toggleSel(id) {
+  const el = document.getElementById('sel_' + id);
+  el.classList.toggle('selected');
+}
+
+// ═══════════════════════════════════════
+// DEBUG ACTIVITY
+// ═══════════════════════════════════════
+function tapDebug(itemId, bugId, actIdx) {
+  // Reset all
+  document.querySelectorAll('.debug-item').forEach(el => {
+    el.classList.remove('selected-bug', 'correct-bug', 'wrong-bug');
+  });
+  const isCorrect = itemId === bugId;
+  const el = document.getElementById('dbg_' + itemId);
+  if (isCorrect) {
+    el.classList.add('correct-bug');
+    el.querySelector('.bug-icon').textContent = '✅';
+    const act = UNPLUGGED[G.level][actIdx];
+    const fixMsg = G.lang === 'bm' ? act.bugFixBm : act.bugFixEn;
+    showToast('🎉 ' + (G.lang === 'bm' ? 'Betul! ' : 'Correct! ') + fixMsg, 'ok');
+    recordScore(actIdx, 'u', 100);
+    setTimeout(() => showResults(1, 1, actIdx, 'u'), 1800);
+  } else {
+    el.classList.add('wrong-bug');
+    el.querySelector('.bug-icon').textContent = '❌';
+    showToast(G.lang === 'bm' ? '❌ Bukan itu. Cuba lagi!' : '❌ Not that one. Try again!', 'err');
+    setTimeout(() => el.classList.remove('wrong-bug'), 1000);
+  }
+}
+
+// ═══════════════════════════════════════
+// CHECK ANSWERS
+// ═══════════════════════════════════════
+function checkSeq(idx) {
+  const act = UNPLUGGED[G.level][idx];
+  const zones = document.querySelectorAll('#dropZones .drop-row');
+  let score = 0;
+  zones.forEach((zone, i) => {
+    const chip = zone.querySelector('.drag-chip');
+    const correct = chip && chip.dataset.id === act.answer[i];
+    zone.classList.remove('correct-slot', 'wrong-slot');
+    zone.classList.add(correct ? 'correct-slot' : (chip ? 'wrong-slot' : ''));
+    if (correct) score++;
+  });
+  const pct = Math.round(score / act.answer.length * 100);
+  recordScore(idx, 'u', pct);
+  setTimeout(() => showResults(score, act.answer.length, idx, 'u'), 700);
+}
+
+function checkCat(idx) {
+  const act = UNPLUGGED[G.level][idx];
+  let score = 0;
+  act.items.forEach(item => {
+    const placed = document.querySelector(`[data-cat][data-id="${item.id}"]`);
+    if (placed && placed.dataset.cat === item.cat) score++;
+  });
+  const pct = Math.round(score / act.items.length * 100);
+  recordScore(idx, 'u', pct);
+  setTimeout(() => showResults(score, act.items.length, idx, 'u'), 700);
+}
+
+function checkSel(idx) {
+  const act = UNPLUGGED[G.level][idx];
+  let tp = 0, fp = 0, fn = 0;
+  act.items.forEach(item => {
+    const el = document.getElementById('sel_' + item.id);
+    const selected = el.classList.contains('selected');
+    el.classList.remove('selected', 'correct-sel', 'wrong-sel', 'missed-sel');
+    if (item.correct && selected)  { el.classList.add('correct-sel'); tp++; }
+    if (!item.correct && selected) { el.classList.add('wrong-sel'); fp++; }
+    if (item.correct && !selected) { el.classList.add('missed-sel'); fn++; }
+  });
+  const total = act.items.filter(i => i.correct).length;
+  const pct = Math.max(0, Math.round((tp - fp) / total * 100));
+  recordScore(idx, 'u', pct);
+  setTimeout(() => showResults(tp, total, idx, 'u'), 700);
+}
+
+function checkPseudo(idx) {
+  const card = PSEUDOCARDS[G.level][idx];
+  const slots = document.querySelectorAll('.seq-slot');
+  let score = 0, fillable = 0;
+  slots.forEach((slot, i) => {
+    if (slot.classList.contains('prefilled')) return;
+    fillable++;
+    const chip = slot.querySelector('.code-chip');
+    const correct = chip && chip.dataset.id === card.answer[i];
+    slot.classList.remove('correct-slot', 'wrong-slot');
+    slot.classList.add(correct ? 'correct-slot' : (chip ? 'wrong-slot' : ''));
+    if (correct) score++;
+  });
+  const total = card.type === 'fill' ? fillable : card.slots;
+  const normTotal = Math.max(total, 1);
+  const pct = Math.round(score / normTotal * 100);
+  recordScore(idx, 'p', pct);
+  setTimeout(() => showResults(score, normTotal, idx, 'p'), 700);
+}
+
+// ═══════════════════════════════════════
+// RESULTS SCREEN
+// ═══════════════════════════════════════
+function showResults(score, total, idx, modeKey) {
+  const pct = Math.round(score / total * 100);
+  const stars = pct >= 90 ? '⭐⭐⭐' : pct >= 60 ? '⭐⭐' : '⭐';
+  const tier = pct >= 90 ? 'great' : pct >= 60 ? 'ok' : 'retry';
+  const msgs = {
+    great: { en: '🎉 Excellent! You are a Computational Thinker!', bm: '🎉 Hebat! Anda seorang Pemikir Komputasi!' },
+    ok:    { en: '👍 Good try! Check the hint and aim for 3 stars!', bm: '👍 Cubaan bagus! Semak petunjuk dan sasarkan 3 bintang!' },
+    retry: { en: '💪 Keep going! Use the hint and try again!', bm: '💪 Teruskan! Gunakan petunjuk dan cuba lagi!' },
+  };
+  const isUnplug = modeKey === 'u';
+  const acts = isUnplug ? (UNPLUGGED[G.level] || []) : (PSEUDOCARDS[G.level] || []);
+  const hasNext = idx + 1 < acts.length;
+  const l = lv(G.level);
+
+  document.getElementById('resultsBody').innerHTML = `
+    <div class="pop-in">
+      <div class="res-stars">${stars}</div>
+      <div class="res-score" style="color:var(${l.cssVar})">${pct}%</div>
+      <div class="res-label">${score}/${total} ${G.lang === 'bm' ? 'betul' : 'correct'} · ${T(l)} ${isUnplug ? (G.lang === 'bm' ? 'Tanpa Peranti' : 'Unplugged') : (G.lang === 'bm' ? 'Pseudokod' : 'Pseudocode')}</div>
+      <div class="res-msg ${tier}">${G.lang === 'bm' ? msgs[tier].bm : msgs[tier].en}</div>
+      <div class="res-acts">
+        ${hasNext ? `<button class="btn btn-success" onclick="startActivity(${idx + 1})">
+          ${G.lang === 'bm' ? 'Seterusnya' : 'Next'} ▶</button>` : ''}
+        <button class="btn btn-warn" onclick="startActivity(${idx})">🔄 ${G.lang === 'bm' ? 'Cuba Lagi' : 'Try Again'}</button>
+        <button class="btn btn-secondary" onclick="nav('actlist','${isUnplug ? 'unplugged' : 'plugged'}')">
+          📋 ${G.lang === 'bm' ? 'Senarai' : 'List'}</button>
+        <button class="btn btn-secondary" onclick="nav('home')">🏠</button>
+      </div>
+    </div>`;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('results').classList.add('active');
+  window.scrollTo(0, 0);
+  refreshLang();
+}
+
+// ═══════════════════════════════════════
+// PROGRESS & LOGGING
+// ═══════════════════════════════════════
+function recordScore(idx, modeKey, pct) {
+  const key = `${G.student}_${G.level}_${modeKey}_${idx}`;
+  const prev = G.prog[key];
+  G.prog[key] = { done: true, pct, ts: Date.now() };
+  const l = lv(G.level);
+  const acts = modeKey === 'u' ? (UNPLUGGED[G.level] || []) : (PSEUDOCARDS[G.level] || []);
+  const act = acts[idx];
+  G.log.unshift({
+    time: new Date().toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' }),
+    student: G.student,
+    action: `${l?.en || G.level} › ${modeKey === 'u' ? 'Unplugged' : 'Pseudo'} ${idx + 1}: ${act ? act.en : ''}`,
+    pct
+  });
+  if (G.log.length > 80) G.log.pop();
+  saveStorage();
+}
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+function renderDashboard() {
+  const students = ['S1','S2','S3','S4','S5','S6'];
+  let totalActs = 0, totalScore = 0, scoreCount = 0;
+  students.forEach(s => {
+    LEVELS.forEach(l => {
+      ['u','p'].forEach(mk => {
+        const acts = mk === 'u' ? (UNPLUGGED[l.id] || []) : (PSEUDOCARDS[l.id] || []);
+        acts.forEach((_, i) => {
+          const d = G.prog[`${s}_${l.id}_${mk}_${i}`];
+          if (d) { totalActs++; totalScore += d.pct || 0; scoreCount++; }
+        });
+      });
+    });
+  });
+  const avg = scoreCount ? Math.round(totalScore / scoreCount) : 0;
+  const activeStudents = students.filter(s => LEVELS.some(l => G.prog[`${s}_${l.id}_u_0`] || G.prog[`${s}_${l.id}_p_0`])).length;
+  const highScorers = students.filter(s => {
+    const scores = [];
+    LEVELS.forEach(l => ['u','p'].forEach(mk => {
+      const acts = mk === 'u' ? (UNPLUGGED[l.id] || []) : (PSEUDOCARDS[l.id] || []);
+      acts.forEach((_, i) => { const d = G.prog[`${s}_${l.id}_${mk}_${i}`]; if (d) scores.push(d.pct); });
+    }));
+    return scores.length && scores.reduce((a,b) => a+b, 0) / scores.length >= 80;
+  }).length;
+
+  document.getElementById('dashStats').innerHTML = `
+    <div class="dash-stat s-blue"><div class="ds-val">${activeStudents}</div><div class="ds-lbl">Active Students</div></div>
+    <div class="dash-stat s-green"><div class="ds-val">${totalActs}</div><div class="ds-lbl">Activities Done</div></div>
+    <div class="dash-stat s-orange"><div class="ds-val">${avg}%</div><div class="ds-lbl">Avg Score</div></div>
+    <div class="dash-stat s-purple"><div class="ds-val">${highScorers}</div><div class="ds-lbl">⭐ High Achievers</div></div>`;
+
+  document.getElementById('dashTable').innerHTML = students.map(s => `
+    <div class="pt-row">
+      <div class="pt-name">${s}</div>
+      ${LEVELS.map(l => {
+        const pct = calcLevelProgressFor(s, l.id);
+        const cls = pct >= 80 ? 'done' : pct > 0 ? 'part' : 'none';
+        return `<div class="pt-cell"><span class="pt-pill ${cls}">${pct ? pct + '%' : '—'}</span></div>`;
+      }).join('')}
+    </div>`).join('');
+
+  document.getElementById('dashLog').innerHTML = G.log.length === 0
+    ? `<div style="padding:20px;text-align:center;color:#475569">No activity yet / Tiada aktiviti lagi</div>`
+    : G.log.slice(0, 30).map(entry => `
+      <div class="log-row">
+        <div class="log-t">${entry.time}</div>
+        <div class="log-s">${entry.student}</div>
+        <div class="log-a">${entry.action}</div>
+        <div class="log-p ${entry.pct >= 80 ? 'hi' : entry.pct >= 50 ? 'mid' : 'lo'}">${entry.pct}%</div>
+      </div>`).join('');
+}
+
+function calcLevelProgressFor(student, lvId) {
+  const u = (UNPLUGGED[lvId] || []).length;
+  const p = (PSEUDOCARDS[lvId] || []).length;
+  const total = u + p; if (!total) return 0;
+  let done = 0;
+  for (let i = 0; i < u; i++) if (G.prog[`${student}_${lvId}_u_${i}`]?.done) done++;
+  for (let i = 0; i < p; i++) if (G.prog[`${student}_${lvId}_p_${i}`]?.done) done++;
+  return Math.round(done / total * 100);
+}
+
+// ═══════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + (type ? 't-' + type : '');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function showHint(msg) {
+  showToast('💡 ' + msg, 'hint');
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+renderHome();
+setLang('en');
+</script>
+</body></html>
